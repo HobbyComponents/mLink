@@ -1,15 +1,17 @@
 /* FILE:    mLink.h
-   DATE:    07/01/23
-   VERSION: 1.6
+   DATE:    16/10/23
+   VERSION: 1.7.0
    AUTHOR:  Andrew Davies
    
-24/09/21 version 1.0: Original version
-24/03/22 version 1.1: Added support for mLink NTC Temperature sensor module (HCMODU0186)
-31/03/22 version 1.2: Added support for mLink matrix 4x4 keypad (HCMODU0188)
-20/04/22 version 1.3: Added support for mLink character LCDs (HCMODU0190x)
-08/06/22 version 1.4: Added support for mLink 12864 graphics LCD (HCMODU0189)
-19/08/22 version 1.5: Added support for mLink 6 Button Keypad (SKU: HCMODU0193)
-07/01/23 version 1.6: Added support for mLink Home Sensor (SKU: HCMODU0198)
+24/09/21 version 1.0.0: Original version
+24/03/22 version 1.1.0: Added support for mLink NTC Temperature sensor module (HCMODU0186)
+31/03/22 version 1.2.0: Added support for mLink matrix 4x4 keypad (HCMODU0188)
+20/04/22 version 1.3.0: Added support for mLink character LCDs (HCMODU0190x)
+08/06/22 version 1.4.0: Added support for mLink 12864 graphics LCD (HCMODU0189)
+19/08/22 version 1.5.0: Added support for mLink 6 Button Keypad (SKU: HCMODU0193)
+07/01/23 version 1.6.0: Added support for mLink Home Sensor (SKU: HCMODU0198)
+16/10/23 version 1.7.0: Added support for mLink IR Transceiver (SKU: HCMODU0195)
+
 
 This library adds hardware support for the Hobby Components mLink range of 
 serial I2C modules to the Arduino IDE. 
@@ -27,7 +29,7 @@ mLink 1602 & 2004 Character LCD (SKU: HCMODU0190A & HCMODU0190B)
 mLink 12864 Graphics LCD (SKU: HCMODU0189)
 mLink 6 Button Keypad (SKU: HCMODU0193)
 mLink Home Sensor (SKU: HCMODU0198)
-
+mLink IR Transceiver (SKU: HCMODU0195)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -781,6 +783,44 @@ enum MLINK_HSENS_REGISTERS
 #define HSens_Clear_Trigs(add)			write(add, HSENS_READ_PIR_TRIGS, 0)
 
 /***********************************************************
+			MLINK IR Transceiver (HCMODU0195)
+***********************************************************/
+// Default I2C address
+#define IR_I2C_ADD	0x5C
+
+// Module specific registers
+enum MLINK_IR_REGISTERS
+{
+  MLINK_IR_RX_COUNT =					10,
+  MLINK_IR_DATA0 =						11,
+  MLINK_IR_DATA1 =						12,
+  MLINK_IR_DATA2 =						13,
+  MLINK_IR_DATA3 =						14,
+  
+  MLINK_IR_SEND =						15,
+  
+  I2C_NEC_ADD =							16,
+  I2C_NEC_DAT =							17,
+  
+  I2C_COM_MODE = 						18
+};
+
+#define IR_VALID_BIT					3
+
+#define IR_COM_LED_I2C					0
+#define IR_COM_LED_IR					1
+
+#define IR_Write_Data(add, data)		write(add, MLINK_IR_DATA0, 4, data)
+#define IR_Write_NEC(add, iradd, irdat)	 writeInt(add, I2C_NEC_ADD, ((uint16_t)irdat << 8) | (uint8_t)iradd)
+#define IR_Count(add)					read(add, MLINK_IR_RX_COUNT);
+#define IR_NEC_Valid(add)				readBit(add, MLINK_STATUS_REG, IR_VALID_BIT)
+#define IR_Read(add, data)				read(add, MLINK_IR_DATA0, 4, (uint8_t *)data)
+#define IR_Read_NEC_Add(add)			read(add, MLINK_IR_DATA0)
+#define IR_Read_NEC_Command(add)		read(add, MLINK_IR_DATA2)
+#define IR_Send(add, count)				write(add, MLINK_IR_SEND, count)
+#define IR_Com_LED_Mode(add, mode)		write(add, I2C_COM_MODE, mode)
+
+/***********************************************************
 					MLINK DATATYPES
 ***********************************************************/
 /*enum MLINK_DATA_TYPES
@@ -810,7 +850,7 @@ class mLink
 		void writeBit(uint8_t add, uint8_t reg, uint8_t bit, boolean state, boolean wait = false);
 		void write(uint8_t add, uint8_t reg, uint8_t data);
 		void writeInt(uint8_t add, uint8_t reg, uint16_t data);	
-//		void writeLong(uint8_t add, uint8_t reg, uint32_t data);
+		//void writeLong(uint8_t add, uint8_t reg, uint32_t data);
 		void write(uint8_t add, uint8_t reg, uint16_t a, uint16_t b, boolean wait = false);
 		void write(uint8_t add, uint8_t reg, uint16_t a, uint16_t b, uint16_t c, uint16_t d, boolean wait = false);
 		void write(uint8_t add, uint8_t reg, uint8_t bytes, uint8_t *data);	
@@ -819,13 +859,14 @@ class mLink
 		uint8_t read(uint8_t add, uint8_t reg);
 		int16_t readInt(uint8_t add, uint8_t reg);
 		uint16_t readuInt(uint8_t add, uint8_t reg);
+		void read(uint8_t add, uint8_t reg, uint8_t bytes, uint8_t *data);
 		
 		void print(uint8_t add, uint8_t reg, char c, boolean wait = false);
 		void print(uint8_t add, uint8_t reg, char *str, boolean wait = false);
 		void print(uint8_t add, uint8_t reg, uint16_t val, boolean wait = false);
 		void print(uint8_t add, uint8_t reg, int16_t val, boolean wait = false);
 		void print(uint8_t add, uint8_t reg, float val, uint8_t dp = 0, boolean wait = false);
-		
+
 
 	private:
 		void _I2CWriteReg(uint8_t add, uint8_t reg, uint8_t data);

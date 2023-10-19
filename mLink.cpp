@@ -1,15 +1,17 @@
 /* FILE:    mLink.cpp
-   DATE:    07/01/23
-   VERSION: 1.6
+   DATE:    16/10/23
+   VERSION: 1.7.0
    AUTHOR:  Andrew Davies
    
-24/09/21 version 1.0: Original version
-24/03/22 version 1.1: Added support for mLink NTC Temperature sensor module (HCMODU0186)
-31/03/22 version 1.2: Added support for mLink matrix 4x4 keypad (HCMODU0188)
-20/04/22 version 1.3: Added support for mLink character LCDs (HCMODU0190x)
-08/06/22 version 1.4: Added support for mLink 12864 graphics LCD (HCMODU0189)
-19/08/22 version 1.5: Added support for mLink 6 Button Keypad (SKU: HCMODU0193)
-07/01/23 version 1.6: Added support for mLink Home Sensor (SKU: HCMODU0198)
+24/09/21 version 1.0.0: Original version
+24/03/22 version 1.1.0: Added support for mLink NTC Temperature sensor module (HCMODU0186)
+31/03/22 version 1.2.0: Added support for mLink matrix 4x4 keypad (HCMODU0188)
+20/04/22 version 1.3.0: Added support for mLink character LCDs (HCMODU0190x)
+08/06/22 version 1.4.0: Added support for mLink 12864 graphics LCD (HCMODU0189)
+19/08/22 version 1.5.0: Added support for mLink 6 Button Keypad (SKU: HCMODU0193)
+07/01/23 version 1.6.0: Added support for mLink Home Sensor (SKU: HCMODU0198)
+16/10/23 version 1.7.0: Added support for mLink IR Transceiver (SKU: HCMODU0195)
+
 
 This library adds hardware support for the Hobby Components mLink range of 
 serial I2C modules to the Arduino IDE. 
@@ -27,7 +29,7 @@ mLink 1602 & 2004 Character LCD (SKU: HCMODU0190A & HCMODU0190B)
 mLink 12864 Graphics LCD (SKU: HCMODU0189)
 mLink 6 Button Keypad (SKU: HCMODU0193)
 mLink Home Sensor (SKU: HCMODU0198)
-
+mLink IR Transceiver (SKU: HCMODU0195)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -399,6 +401,31 @@ int16_t mLink::readInt(uint8_t add, uint8_t reg)
 
 
 
+
+/* Reads the state of multiple sequential registers.
+
+ PARAMETERS:
+
+ add: byte value containing I2C address of the mLink module. 
+
+ reg: byte value containing the register number to read. 
+
+ bytes: the number of bytes (registers) to be read
+ 
+ *data: A pointer to the start of the memory to write the data to
+ 
+ RETURNS: 
+ Void
+*/
+void mLink::read(uint8_t add, uint8_t reg, uint8_t bytes, uint8_t *data)
+{
+	_I2CReadReg(add, reg, bytes, data);	
+}
+
+
+
+
+
 /* Writes an 8 bit walue of type char to an mLink register
 
  PARAMETERS:
@@ -631,7 +658,7 @@ uint8_t mLink::_I2CReadReg(uint8_t add, uint8_t reg)
 
  bytes: the number of bytes (registers) to be read
  
- *data: A pointer to the start of the data to write to data to
+ *data: A pointer to the start of the memory to write the data to
  
  RETURNS: 
  Void

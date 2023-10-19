@@ -18,7 +18,8 @@ mLink Matrix 4x4 keypad (SKU: HCMODU0188)\
 mLink 1602 & 2004 Character LCD (SKU: HCMODU0190A & HCMODU0190B)\
 mLink 12864 Graphics LCD (SKU: HCMODU0189)\
 mLink 6 Button Keypad (SKU: HCMODU0193)\
-mLink Home Sensor (SKU: HCMODU0198)
+mLink Home Sensor (SKU: HCMODU0198)\
+mLink IR Transceiver (SKU: HCMODU0195)
 
 
 
