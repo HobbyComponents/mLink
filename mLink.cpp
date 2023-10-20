@@ -1,6 +1,6 @@
 /* FILE:    mLink.cpp
-   DATE:    16/10/23
-   VERSION: 1.7.0
+   DATE:    20/10/23
+   VERSION: 1.7.1
    AUTHOR:  Andrew Davies
    
 24/09/21 version 1.0.0: Original version
@@ -11,6 +11,7 @@
 19/08/22 version 1.5.0: Added support for mLink 6 Button Keypad (SKU: HCMODU0193)
 07/01/23 version 1.6.0: Added support for mLink Home Sensor (SKU: HCMODU0198)
 16/10/23 version 1.7.0: Added support for mLink IR Transceiver (SKU: HCMODU0195)
+20/10/23 version 1.7.1: Minor modification to mLink IR transceiver register naming
 
 
 This library adds hardware support for the Hobby Components mLink range of 

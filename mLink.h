@@ -1,6 +1,6 @@
 /* FILE:    mLink.h
-   DATE:    16/10/23
-   VERSION: 1.7.0
+   DATE:    20/10/23
+   VERSION: 1.7.1
    AUTHOR:  Andrew Davies
    
 24/09/21 version 1.0.0: Original version
@@ -11,6 +11,7 @@
 19/08/22 version 1.5.0: Added support for mLink 6 Button Keypad (SKU: HCMODU0193)
 07/01/23 version 1.6.0: Added support for mLink Home Sensor (SKU: HCMODU0198)
 16/10/23 version 1.7.0: Added support for mLink IR Transceiver (SKU: HCMODU0195)
+20/10/23 version 1.7.1: Minor modification to mLink IR transceiver register naming
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -799,10 +800,10 @@ enum MLINK_IR_REGISTERS
   
   MLINK_IR_SEND =						15,
   
-  I2C_NEC_ADD =							16,
-  I2C_NEC_DAT =							17,
+  MLINK_IR_NEC_ADD =					16,
+  MLINK_IR_NEC_COM =					17,
   
-  I2C_COM_MODE = 						18
+  MLINK_IR_COM_MODE = 					18
 };
 
 #define IR_VALID_BIT					3
@@ -811,14 +812,14 @@ enum MLINK_IR_REGISTERS
 #define IR_COM_LED_IR					1
 
 #define IR_Write_Data(add, data)		write(add, MLINK_IR_DATA0, 4, data)
-#define IR_Write_NEC(add, iradd, irdat)	 writeInt(add, I2C_NEC_ADD, ((uint16_t)irdat << 8) | (uint8_t)iradd)
+#define IR_Write_NEC(add, iradd, irdat)	 writeInt(add, MLINK_IR_NEC_ADD, ((uint16_t)irdat << 8) | (uint8_t)iradd)
 #define IR_Count(add)					read(add, MLINK_IR_RX_COUNT);
 #define IR_NEC_Valid(add)				readBit(add, MLINK_STATUS_REG, IR_VALID_BIT)
 #define IR_Read(add, data)				read(add, MLINK_IR_DATA0, 4, (uint8_t *)data)
 #define IR_Read_NEC_Add(add)			read(add, MLINK_IR_DATA0)
 #define IR_Read_NEC_Command(add)		read(add, MLINK_IR_DATA2)
 #define IR_Send(add, count)				write(add, MLINK_IR_SEND, count)
-#define IR_Com_LED_Mode(add, mode)		write(add, I2C_COM_MODE, mode)
+#define IR_Com_LED_Mode(add, mode)		write(add, MLINK_IR_COM_MODE, mode)
 
 /***********************************************************
 					MLINK DATATYPES
