@@ -39,6 +39,7 @@ Please see Licence.txt in the library folder for terms of use.
 #define MLINK_h
 
 #include "Arduino.h"
+#include <avr/dtostrf.h>
 
 /***********************************************************
 	 	MLINK REGISTERS COMMON TO ALL MLINK DEVICES
