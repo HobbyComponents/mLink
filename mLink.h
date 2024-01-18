@@ -1,6 +1,6 @@
 /* FILE:    mLink.h
    DATE:    20/10/23
-   VERSION: 1.7.1
+   VERSION: 1.7.2
    AUTHOR:  Andrew Davies
    
 24/09/21 version 1.0.0: Original version
@@ -12,7 +12,12 @@
 07/01/23 version 1.6.0: Added support for mLink Home Sensor (SKU: HCMODU0198)
 16/10/23 version 1.7.0: Added support for mLink IR Transceiver (SKU: HCMODU0195)
 20/10/23 version 1.7.1: Minor modification to mLink IR transceiver register naming
-
+28/10/23 version 1.7.2: ExplicitChimp:  Forked repos, Added #include <avr/dtostrf.h> @ line 43 and corrected 
+					lines 225 to 228 (inclusive) to read "readBit(RLY_I2C_ADD, ...)"
+16/01/23 version 1.7.3: ExplicitChimp:  Corrected lines 225 to 228 (inclusive) to read "readBit(add, ...)"
+17/01/23 version 1.7.4: ExplicitChimp:  Correct some issues I created with version history.  Removed #include 
+					<avr/dtostrf.h> from line 43, and added a #ifdef statement to capture 
+     					none AVR boards requiring <avr/dtostrf.h>.
 
 This library adds hardware support for the Hobby Components mLink range of 
 serial I2C modules to the Arduino IDE. 
@@ -38,7 +43,14 @@ Please see Licence.txt in the library folder for terms of use.
 #ifndef MLINK_h
 #define MLINK_h
 
+#ifdef __AVR__
+//Do nothing
+#else
+#include <avr/dtostrf.h>
+#endif
+
 #include "Arduino.h"
+
 
 /***********************************************************
 	 	MLINK REGISTERS COMMON TO ALL MLINK DEVICES
@@ -220,10 +232,10 @@ enum MLINK_4CH_RELAY_REGISTERS
 #define SET_RLY2(add, state)		writeBit(add, MLINK_RELAY_STATE_REG, 2, state)
 #define SET_RLY3(add, state)		writeBit(add, MLINK_RELAY_STATE_REG, 3, state)
 
-#define READ_RLY0(add)				readBit(I2C_ADD, MLINK_RELAY_STATE_REG, 0)
-#define READ_RLY1(add)				readBit(I2C_ADD, MLINK_RELAY_STATE_REG, 1)
-#define READ_RLY2(add)				readBit(I2C_ADD, MLINK_RELAY_STATE_REG, 2)
-#define READ_RLY3(add)				readBit(I2C_ADD, MLINK_RELAY_STATE_REG, 3)
+#define READ_RLY0(add)				readBit(add, MLINK_RELAY_STATE_REG, 0)
+#define READ_RLY1(add)				readBit(add, MLINK_RELAY_STATE_REG, 1)
+#define READ_RLY2(add)				readBit(add, MLINK_RELAY_STATE_REG, 2)
+#define READ_RLY3(add)				readBit(add, MLINK_RELAY_STATE_REG, 3)
 
 #define RLY0_ON_TIME				MLINK_RLY0_ON_TIME_L
 #define RLY1_ON_TIME				MLINK_RLY1_ON_TIME_L
