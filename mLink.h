@@ -1,6 +1,6 @@
 /* FILE:    mLink.h
-   DATE:    20/10/23
-   VERSION: 1.7.2
+   DATE:    19/01/24
+   VERSION: 1.8.0
    AUTHOR:  Andrew Davies
    
 24/09/21 version 1.0.0: Original version
@@ -18,6 +18,8 @@
 17/01/23 version 1.7.4: ExplicitChimp:  Correct some issues I created with version history.  Removed #include 
 					<avr/dtostrf.h> from line 43, and added a #ifdef statement to capture 
      					none AVR boards requiring <avr/dtostrf.h>.
+19/01/24 version 1.8.0: Added support for mLink L9110 DC Motor Driver (SKU: HCMODU0199)
+
 
 This library adds hardware support for the Hobby Components mLink range of 
 serial I2C modules to the Arduino IDE. 
@@ -36,6 +38,7 @@ mLink 12864 Graphics LCD (SKU: HCMODU0189)
 mLink 6 Button Keypad (SKU: HCMODU0193)
 mLink Home Sensor (SKU: HCMODU0198)
 mLink IR Transceiver (SKU: HCMODU0195)
+mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -83,6 +86,12 @@ enum MLINK_STD_REGISTERS
 	#define ON							1
 #endif
 
+#ifndef REVERSE
+	#define REVERSE						0
+#endif
+#ifndef FORWARD
+	#define FORWARD						1
+#endif
 
 /***********************************************************
 		MLINK 12 BIT PORT EXPANDER (HCMODU0180)
@@ -832,6 +841,37 @@ enum MLINK_IR_REGISTERS
 #define IR_Read_NEC_Command(add)		read(add, MLINK_IR_DATA2)
 #define IR_Send(add, count)				write(add, MLINK_IR_SEND, count)
 #define IR_Com_LED_Mode(add, mode)		write(add, MLINK_IR_COM_MODE, mode)
+
+
+/***********************************************************
+		MLINK L9110 DC MOTOR CONTROLLER (HCMODU0199)
+***********************************************************/
+// Default I2C address
+#define L9110_I2C_ADD	0x5D
+
+// Module specific registers
+enum MLINK_L9110_REGISTERS
+{
+  MLINK_L9110_M1_SPEED =				10,
+  MLINK_L9110_M2_SPEED =				11,
+  MLINK_L9110_M1_DIR =					12,
+  MLINK_L9110_M2_DIR =					13
+};
+
+#define L9110_M1_SPEED					MLINK_L9110_M1_SPEED
+#define L9110_M2_SPEED					MLINK_L9110_M2_SPEED
+#define L9110_M1_DIR					MLINK_L9110_M1_DIR
+#define L9110_M2_DIR					MLINK_L9110_M2_DIR
+
+#define L9110_M1_Speed(add, speed)		write(add, L9110_M1_SPEED, speed)
+#define L9110_M2_Speed(add, speed)		write(add, L9110_M2_SPEED, speed)
+
+#define L9110_M1_Dir(add, dir)			write(add, L9110_M1_DIR, dir)
+#define L9110_M2_Dir(add, dir)			write(add, L9110_M2_DIR, dir)
+
+#define L9110_M1_Stop(add)				write(add, L9110_M1_SPEED, 0)
+#define L9110_M2_Stop(add)				write(add, L9110_M2_SPEED, 0)
+
 
 /***********************************************************
 					MLINK DATATYPES
