@@ -1,6 +1,6 @@
 /* FILE:    mLink.h
-   DATE:    19/01/24
-   VERSION: 1.8.0
+   DATE:    22/01/24
+   VERSION: 1.9.0
    AUTHOR:  Andrew Davies
    
 24/09/21 version 1.0.0: Original version
@@ -19,6 +19,7 @@
 					<avr/dtostrf.h> from line 43, and added a #ifdef statement to capture 
      					none AVR boards requiring <avr/dtostrf.h>.
 19/01/24 version 1.8.0: Added support for mLink L9110 DC Motor Driver (SKU: HCMODU0199)
+22/01/24 version 1.9.0: Added support for mLink TMP36 temperature sensor (SKU: HCMODU0187)
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -39,6 +40,7 @@ mLink 6 Button Keypad (SKU: HCMODU0193)
 mLink Home Sensor (SKU: HCMODU0198)
 mLink IR Transceiver (SKU: HCMODU0195)
 mLink L9110 DC Motor Controller (SKU: HCMODU0199)
+mLink TMP36 Temperature Sensor (HCMODU0187)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -713,6 +715,27 @@ enum MLINK_GLCD_REGISTERS
 #define gLCD_setCustBitmap14(add, b)   	write(add, GLCD_CC14_BITMAP, sizeof(b), (uint8_t *)b)
 #define gLCD_setCustBitmap15(add, b)	write(add, GLCD_CC15_BITMAP, sizeof(b), (uint8_t *)b)
 /**********************************************************/
+
+
+
+/***********************************************************
+		MLINK TMP36 Temperature Sensor (HCMODU0187)
+***********************************************************/
+// Default I2C address
+#define BPAD_I2C_ADD	0x58
+
+// Module specific registers
+enum MLINK_TMP36_REGISTERS
+{
+  MLINK_TMP36_TEMPL_REG =				11,
+  MLINK_TMP36_TEMPH_REG =				12,
+};
+
+// I2C read and write command macros
+#define TMP36_READ_TEMP   	MLINK_TMP36_TEMPL_REG
+#define TMP36_Temp(add)		readInt(add, TMP36_READ_TEMP) / (float)10
+/**********************************************************/
+
 
 
 /***********************************************************

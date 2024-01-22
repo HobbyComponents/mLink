@@ -20,7 +20,8 @@ mLink 12864 Graphics LCD (SKU: HCMODU0189)\
 mLink 6 Button Keypad (SKU: HCMODU0193)\
 mLink Home Sensor (SKU: HCMODU0198)\
 mLink IR Transceiver (SKU: HCMODU0195)\
-mLink L9110 DC Motor Controller (SKU: HCMODU0199)
+mLink L9110 DC Motor Controller (SKU: HCMODU0199)\
+mLink TMP36 Temperature Sensor (SKU: HCMODU0187)
 
 
 
