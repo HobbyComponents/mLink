@@ -1,6 +1,6 @@
 /* FILE:    mLink.cpp
    DATE:    22/01/24
-   VERSION: 1.9.0
+   VERSION: 1.9.1
    AUTHOR:  Andrew Davies
    
 24/09/21 version 1.0.0: Original version
@@ -20,6 +20,7 @@
      					none AVR boards requiring <avr/dtostrf.h>.
 19/01/24 version 1.8.0: Added support for mLink L9110 DC Motor Driver (SKU: HCMODU0199)
 22/01/24 version 1.9.0: Added support for mLink TMP36 temperature sensor (SKU: HCMODU0187)
+22/01/24 version 1.9.1: Minor fix to TMP36 default address definition
 
 
 This library adds hardware support for the Hobby Components mLink range of 
