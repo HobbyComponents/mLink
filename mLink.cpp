@@ -1,6 +1,6 @@
 /* FILE:    mLink.cpp
-   DATE:    22/01/24
-   VERSION: 1.9.1
+   DATE:    23/03/24
+   VERSION: 2.0.0
    AUTHOR:  Andrew Davies
    
 24/09/21 version 1.0.0: Original version
@@ -21,6 +21,7 @@
 19/01/24 version 1.8.0: Added support for mLink L9110 DC Motor Driver (SKU: HCMODU0199)
 22/01/24 version 1.9.0: Added support for mLink TMP36 temperature sensor (SKU: HCMODU0187)
 22/01/24 version 1.9.1: Minor fix to TMP36 default address definition
+25/03/24 version 2.0.0:	Added support for mLink WS2812 RGB LED controller (HCMODU0197)
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -42,6 +43,7 @@ mLink Home Sensor (SKU: HCMODU0198)
 mLink IR Transceiver (SKU: HCMODU0195)
 mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 mLink TMP36 Temperature Sensor (HCMODU0187)
+mLink WS2812 RGB LED controller (HCMODU0197)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -168,6 +170,27 @@ void mLink::write(uint8_t add, uint8_t reg, uint8_t data)
 	_I2CWriteReg(add, reg, data);
 }
 
+
+
+/* Writes to one of the mLink modules 8 bit registers.
+
+ PARAMETERS:
+
+ add: byte value containing I2C address of the mLink module. 
+
+ reg: byte value containing the register number to write to. 
+
+ data: byte value containing the data to write to the register.
+
+ RETURNS: 
+ Void 
+*/
+void mLink::writewb(uint8_t add, uint8_t reg, uint8_t data)
+{
+	_I2CWriteReg(add, reg, data);
+
+	while(busy(add));
+}
 
 
 
@@ -622,7 +645,7 @@ void mLink::_I2CWriteReg(uint8_t add, uint8_t reg, uint8_t bytes, uint8_t *data)
   {
     Wire.write(data[i]);
   }
-    
+
   Wire.endTransmission(true);
 }
 

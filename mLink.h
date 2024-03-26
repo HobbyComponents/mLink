@@ -1,6 +1,6 @@
 /* FILE:    mLink.h
-   DATE:    22/01/24
-   VERSION: 1.9.1
+   DATE:    23/03/24
+   VERSION: 2.0.0
    AUTHOR:  Andrew Davies
    
 24/09/21 version 1.0.0: Original version
@@ -21,6 +21,7 @@
 19/01/24 version 1.8.0: Added support for mLink L9110 DC Motor Driver (SKU: HCMODU0199)
 22/01/24 version 1.9.0: Added support for mLink TMP36 temperature sensor (SKU: HCMODU0187)
 22/01/24 version 1.9.1: Minor fix to TMP36 default address definition
+25/03/24 version 2.0.0:	Added support for mLink WS2812 RGB LED controller (HCMODU0197)
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -42,6 +43,7 @@ mLink Home Sensor (SKU: HCMODU0198)
 mLink IR Transceiver (SKU: HCMODU0195)
 mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 mLink TMP36 Temperature Sensor (HCMODU0187)
+mLink WS2812 RGB LED controller (HCMODU0197)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -718,7 +720,6 @@ enum MLINK_GLCD_REGISTERS
 /**********************************************************/
 
 
-
 /***********************************************************
 		MLINK TMP36 Temperature Sensor (HCMODU0187)
 ***********************************************************/
@@ -736,7 +737,6 @@ enum MLINK_TMP36_REGISTERS
 #define TMP36_READ_TEMP   	MLINK_TMP36_TEMPL_REG
 #define TMP36_Temp(add)		readInt(add, TMP36_READ_TEMP) / (float)10
 /**********************************************************/
-
 
 
 /***********************************************************
@@ -837,18 +837,18 @@ enum MLINK_HSENS_REGISTERS
 // Module specific registers
 enum MLINK_IR_REGISTERS
 {
-  MLINK_IR_RX_COUNT =					10,
-  MLINK_IR_DATA0 =						11,
-  MLINK_IR_DATA1 =						12,
-  MLINK_IR_DATA2 =						13,
-  MLINK_IR_DATA3 =						14,
+  MLINK_IR_RX_COUNT_REG =				10,
+  MLINK_IR_DATA0_REG =					11,
+  MLINK_IR_DATA1_REG =					12,
+  MLINK_IR_DATA2_REG =					13,
+  MLINK_IR_DATA3_REG =					14,
   
-  MLINK_IR_SEND =						15,
+  MLINK_IR_SEND_REG =					15,
   
-  MLINK_IR_NEC_ADD =					16,
-  MLINK_IR_NEC_COM =					17,
+  MLINK_IR_NEC_ADD_REG =				16,
+  MLINK_IR_NEC_COM_REG =				17,
   
-  MLINK_IR_COM_MODE = 					18
+  MLINK_IR_COM_MODE_REG = 				18
 };
 
 #define IR_VALID_BIT					3
@@ -856,15 +856,15 @@ enum MLINK_IR_REGISTERS
 #define IR_COM_LED_I2C					0
 #define IR_COM_LED_IR					1
 
-#define IR_Write_Data(add, data)		write(add, MLINK_IR_DATA0, 4, data)
-#define IR_Write_NEC(add, iradd, irdat)	 writeInt(add, MLINK_IR_NEC_ADD, ((uint16_t)irdat << 8) | (uint8_t)iradd)
-#define IR_Count(add)					read(add, MLINK_IR_RX_COUNT);
+#define IR_Write_Data(add, data)		write(add, MLINK_IR_DATA0_REG, 4, data)
+#define IR_Write_NEC(add, iradd, irdat)	 writeInt(add, MLINK_IR_NEC_ADD_REG, ((uint16_t)irdat << 8) | (uint8_t)iradd)
+#define IR_Count(add)					read(add, MLINK_IR_RX_COUNT_REG);
 #define IR_NEC_Valid(add)				readBit(add, MLINK_STATUS_REG, IR_VALID_BIT)
-#define IR_Read(add, data)				read(add, MLINK_IR_DATA0, 4, (uint8_t *)data)
-#define IR_Read_NEC_Add(add)			read(add, MLINK_IR_DATA0)
-#define IR_Read_NEC_Command(add)		read(add, MLINK_IR_DATA2)
-#define IR_Send(add, count)				write(add, MLINK_IR_SEND, count)
-#define IR_Com_LED_Mode(add, mode)		write(add, MLINK_IR_COM_MODE, mode)
+#define IR_Read(add, data)				read(add, MLINK_IR_DATA0_REG, 4, (uint8_t *)data)
+#define IR_Read_NEC_Add(add)			read(add, MLINK_IR_DATA0_REG)
+#define IR_Read_NEC_Command(add)		read(add, MLINK_IR_DATA2_REG)
+#define IR_Send(add, count)				write(add, MLINK_IR_SEND_REG, count)
+#define IR_Com_LED_Mode(add, mode)		write(add, MLINK_IR_COM_MODE_REG, mode)
 
 
 /***********************************************************
@@ -876,16 +876,16 @@ enum MLINK_IR_REGISTERS
 // Module specific registers
 enum MLINK_L9110_REGISTERS
 {
-  MLINK_L9110_M1_SPEED =				10,
-  MLINK_L9110_M2_SPEED =				11,
-  MLINK_L9110_M1_DIR =					12,
-  MLINK_L9110_M2_DIR =					13
+  MLINK_L9110_M1_SPEED_REG =			10,
+  MLINK_L9110_M2_SPEED_REG =			11,
+  MLINK_L9110_M1_DIR_REG =				12,
+  MLINK_L9110_M2_DIR_REG =				13
 };
 
-#define L9110_M1_SPEED					MLINK_L9110_M1_SPEED
-#define L9110_M2_SPEED					MLINK_L9110_M2_SPEED
-#define L9110_M1_DIR					MLINK_L9110_M1_DIR
-#define L9110_M2_DIR					MLINK_L9110_M2_DIR
+#define L9110_M1_SPEED					MLINK_L9110_M1_SPEED_REG
+#define L9110_M2_SPEED					MLINK_L9110_M2_SPEED_REG
+#define L9110_M1_DIR					MLINK_L9110_M1_DIR_REG
+#define L9110_M2_DIR					MLINK_L9110_M2_DIR_REG
 
 #define L9110_M1_Speed(add, speed)		write(add, L9110_M1_SPEED, speed)
 #define L9110_M2_Speed(add, speed)		write(add, L9110_M2_SPEED, speed)
@@ -895,6 +895,68 @@ enum MLINK_L9110_REGISTERS
 
 #define L9110_M1_Stop(add)				write(add, L9110_M1_SPEED, 0)
 #define L9110_M2_Stop(add)				write(add, L9110_M2_SPEED, 0)
+
+
+
+/***********************************************************
+		MLINK WS2812 RGB LED CONTROLLER (HCMODU0197)
+***********************************************************/
+// Default I2C address
+#define WS2812_I2C_ADD	0x5E
+
+// Module specific registers
+enum MLINK_WS2812_REGISTERS
+{
+  MLINK_WS2812_LED_COUNT_REG =			10,
+  MLINK_WS2812_LED_INDEX_REG =			11,
+  MLINK_WS2812_WRITE_RED_REG =			12,
+  MLINK_WS2812_WRITE_GRN_REG =			13,
+  MLINK_WS2812_WRITE_BLU_REG =			14,
+  MLINK_WS2812_REFRESH_REG =			15,
+  MLINK_WS2812_CLEAR_BUFFER_REG =		16,
+  MLINK_WS2812_BRIGHTNESS_REG =			17,
+  MLINK_WS2812_ON_STATE_REG =			18,
+  MLINK_WS2812_RGB_ORDER_REG =			19
+};
+
+
+#define WS2812_COUNT					MLINK_WS2812_LED_COUNT_REG
+#define WS2812_INDEX					MLINK_WS2812_LED_INDEX_REG
+#define WS2812_R						MLINK_WS2812_WRITE_RED_REG
+#define WS2812_G						MLINK_WS2812_WRITE_GRN_REG
+#define WS2812_B						MLINK_WS2812_WRITE_BLU_REG
+#define WS2812_REFRESH					MLINK_WS2812_REFRESH_REG
+#define WS2812_CLEAR					MLINK_WS2812_CLEAR_BUFFER_REG
+#define WS2812_BRIGHTNESS				MLINK_WS2812_BRIGHTNESS_REG
+#define WS2812_ON_STATE					MLINK_WS2812_ON_STATE_REG
+#define WS2812_RGBORDER					MLINK_WS2812_RGB_ORDER_REG
+
+#define WS2812_ORDER_RGB				0
+#define WS2812_ORDER_GRB				1
+
+
+#define WS2812_Max(add, c)				write(add, WS2812_COUNT, c)
+#define WS2812_Index(add, i)			write(add, WS2812_INDEX, i)
+#define WS2812_Red(add, r)				write(add, WS2812_R, r)
+#define WS2812_Green(add, g)			write(add, WS2812_G, g)
+#define WS2812_Blue(add, b)				write(add, WS2812_B, b)
+#define WS2812_Refresh(add)				write(add, WS2812_REFRESH, 1)
+#define WS2812_Clear(add)				writewb(add, WS2812_CLEAR, 1)
+#define WS2812_Brightness(add, l)		write(add, WS2812_BRIGHTNESS, l)
+#define WS2812_On(add, s)				write(add, WS2812_ON_STATE, s)
+#define WS2812_Order(add, o)			write(add, WS2812_RGBORDER, o)
+
+#define WS2812_RGB(add, i, r, g, b)		write(I2C_ADD, WS2812_INDEX, ((uint16_t)r << 8) | (uint8_t)i , ((uint16_t)b << 8) | (uint8_t)g, false)
+
+#define WS2812_WriteBuffer(add, d)		write(add, WS2812_R, sizeof(d), (uint8_t *)d)  
+
+#define WS2812_Get_Red(add)				read(add, WS2812_R)
+#define WS2812_Get_Green(add)			read(add, WS2812_G)
+#define WS2812_Get_Blue(add)			read(add, WS2812_B)
+#define WS2812_Get_Brightness(add)		read(add, WS2812_BRIGHTNESS)
+#define WS2812_Get_On_State(add)		read(add, WS2812_ON_STATE)
+
+
 
 
 /***********************************************************
@@ -926,6 +988,7 @@ class mLink
 		
 		void writeBit(uint8_t add, uint8_t reg, uint8_t bit, boolean state, boolean wait = false);
 		void write(uint8_t add, uint8_t reg, uint8_t data);
+		void writewb(uint8_t add, uint8_t reg, uint8_t data);
 		void writeInt(uint8_t add, uint8_t reg, uint16_t data);	
 		//void writeLong(uint8_t add, uint8_t reg, uint32_t data);
 		void write(uint8_t add, uint8_t reg, uint16_t a, uint16_t b, boolean wait = false);
