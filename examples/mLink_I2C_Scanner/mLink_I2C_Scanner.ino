@@ -1,6 +1,6 @@
 /* FILE:    mLink_I2C_Scanner.ino
-   DATE:    07/01/23
-   VERSION: 1.6
+   DATE:    27/03/24
+   VERSION: 2.0.0
    AUTHOR:  Andrew Davies
    
 
@@ -15,11 +15,17 @@ mLink 1 channel relay module (SKU: HCMODU0182)
 mLink 2 channel relay module (SKU: HCMODU0183)
 mLink 4 channel relay module (SKU: HCMODU0184)
 mLink RGBW light controller (SKU: HCMODU0185)
-mLink NTC temperature sensor (SKU: HCMODU0186)
+mLink NTC Temperature sensor module (SKU: HCMODU0186)
 mLink Matrix 4x4 Keypad (SKU: HCMODU0188)
 mLink 1602 & 2004 Character LCD (SKU: HCMODU0190A & HCMODU0190B)
+mLink 12864 Graphics LCD (SKU: HCMODU0189)
 mLink 6 Button Keypad (SKU: HCMODU0193)
 mLink Home Sensor (SKU: HCMODU0198)
+mLink IR Transceiver (SKU: HCMODU0195)
+mLink L9110 DC Motor Controller (SKU: HCMODU0199)
+mLink TMP36 Temperature Sensor (HCMODU0187)
+mLink WS2812 RGB LED controller (HCMODU0197)
+
 
 If your mLink module is not listed above then please update this sketch & library
 to the latest version via our support forum (forum.hobbycompoents.com).
@@ -97,6 +103,13 @@ void printType(byte add)
 	 case 0x05:
       Serial.print("Display");
       break;
+	 
+	 case 0x06:
+	  Serial.print("Wireless");
+	  break;
+	 
+	 case 0x07:
+	  Serial.print("Motor controller");
 
      default:
       Serial.print("Unkown: 0x");
@@ -164,8 +177,11 @@ void printSubType(byte add)
       switch(subType)
       {
         case 0x00:
-          Serial.print("RGBW");
+          Serial.print("RGBW PWM LED Controller");
           break;
+		
+		case 0x01:
+		  Serial.print("WS2812 RGB LED Controller");
       }
       break;
 
@@ -194,7 +210,24 @@ void printSubType(byte add)
 		  break;
 	  }
 	  break;
-	  
+	
+	case 0x06:
+	  switch(subType) 
+	  {
+		case 0x00:
+	      Serial.print("NEC IR Transceiver");
+		  break;
+	  }
+	  break;
+	
+	case 0x07:
+	  switch(subType) 
+	  {
+		case 0x00:
+	      Serial.print("L9110 DC Motor Controller");
+		  break;
+	  }
+	  break;
 	  
     default:
       Serial.print("Unkown: 0x");

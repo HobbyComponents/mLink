@@ -22,7 +22,7 @@ mLink Home Sensor (SKU: HCMODU0198)\
 mLink IR Transceiver (SKU: HCMODU0195)\
 mLink L9110 DC Motor Controller (SKU: HCMODU0199)\
 mLink TMP36 Temperature Sensor (SKU: HCMODU0187)\
-mLink WS2812 RGB LED controller (HCMODU0197)\
+mLink WS2812 RGB LED controller (HCMODU0197)
 
 
 You will need to download and unzip this library to your Arduino development environments library area.
