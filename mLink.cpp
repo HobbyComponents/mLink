@@ -1,6 +1,6 @@
 /* FILE:    mLink.cpp
-   DATE:    23/03/24
-   VERSION: 2.0.0
+   DATE:    06/08/24
+   VERSION: 2.1.0
    AUTHOR:  Andrew Davies
    
 24/09/21 version 1.0.0: Original version
@@ -22,6 +22,7 @@
 22/01/24 version 1.9.0: Added support for mLink TMP36 temperature sensor (SKU: HCMODU0187)
 22/01/24 version 1.9.1: Minor fix to TMP36 default address definition
 25/03/24 version 2.0.0:	Added support for mLink WS2812 RGB LED controller (HCMODU0197)
+06/08/24 version 2.1.0: Added support for LongReach LoRa Transceiver (HCMODU0250)
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -44,9 +45,11 @@ mLink IR Transceiver (SKU: HCMODU0195)
 mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 mLink TMP36 Temperature Sensor (HCMODU0187)
 mLink WS2812 RGB LED controller (HCMODU0197)
+mLink LongReach LoRa Transceiver (HCMODU0250)
 
 Please see Licence.txt in the library folder for terms of use.
 */
+
 
 
 #include "mLink.h"
@@ -207,9 +210,12 @@ void mLink::writewb(uint8_t add, uint8_t reg, uint8_t data)
  RETURNS: 
  Void 
 */
-void mLink::writeInt(uint8_t add, uint8_t reg, uint16_t data)
+void mLink::writeInt(uint8_t add, uint8_t reg, uint16_t data, boolean wait)
 {
 	_I2CWriteReg(add, reg, 2, (uint8_t *)&data);
+	
+	if(wait)
+		while(busy(add));
 }
 
 
@@ -647,6 +653,7 @@ void mLink::_I2CWriteReg(uint8_t add, uint8_t reg, uint8_t bytes, uint8_t *data)
   }
 
   Wire.endTransmission(true);
+  
 }
 
 

@@ -1,8 +1,8 @@
 /* FILE:    mLink.h
-   DATE:    23/03/24
-   VERSION: 2.0.0
+   DATE:    06/08/24
+   VERSION: 2.1.0
    AUTHOR:  Andrew Davies
-   
+
 24/09/21 version 1.0.0: Original version
 24/03/22 version 1.1.0: Added support for mLink NTC Temperature sensor module (HCMODU0186)
 31/03/22 version 1.2.0: Added support for mLink matrix 4x4 keypad (HCMODU0188)
@@ -22,6 +22,7 @@
 22/01/24 version 1.9.0: Added support for mLink TMP36 temperature sensor (SKU: HCMODU0187)
 22/01/24 version 1.9.1: Minor fix to TMP36 default address definition
 25/03/24 version 2.0.0:	Added support for mLink WS2812 RGB LED controller (HCMODU0197)
+06/08/24 version 2.1.0: Added support for LongReach LoRa Transceiver (HCMODU0250)
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -44,9 +45,11 @@ mLink IR Transceiver (SKU: HCMODU0195)
 mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 mLink TMP36 Temperature Sensor (HCMODU0187)
 mLink WS2812 RGB LED controller (HCMODU0197)
+mLink LongReach LoRa Transceiver (HCMODU0250)
 
 Please see Licence.txt in the library folder for terms of use.
 */
+
 
 #ifndef MLINK_h
 #define MLINK_h
@@ -204,6 +207,9 @@ enum MLINK_DHT22_REGISTERS
 #define DHT22_START_MEAS  	MLINK_DHT22_DHTREAD_REG, 1
 #define DHT22_READ_TEMP   	MLINK_DHT22_TEMPL_REG
 #define DHT22_READ_HUM   	MLINK_DHT22_HUML_REG
+
+#define DHT22_Start(add)	write(add, MLINK_DHT22_DHTREAD_REG, 1)
+#define DHT22_Busy(add)		busy(add)
 #define DHT22_Temp(add)		readInt(add, DHT22_READ_TEMP) / (float)10
 #define DHT22_Hum(add)		readInt(add, DHT22_READ_HUM) / (float)10
 
@@ -958,6 +964,108 @@ enum MLINK_WS2812_REGISTERS
 
 
 
+/***********************************************************
+		MLINK LONGREACH RM95 LORA MODULE (HCMODU0250)
+***********************************************************/
+// Default I2C address
+#define LONGREACH_I2C_ADD	0x5F
+
+// Module specific registers
+enum MLINK_LORA_REGISTERS
+{
+  LORA_RX_AVAILABLE_REG =				10,
+  LORA_RX_SIZE_REG =					11,
+  LORA_RX_READ_REG =					12,
+  LORA_RX_ADD_REG =						13,
+  LORA_TX_LOAD_REG =					14,
+  LORA_TX_SEND_REG =					15,
+ // LORA_TX_LR_SEND_REG =					15,
+  LORA_TX_DONE_REG =					16,
+  LORA_MODE_REG =						17,
+  LORA_FREQ_REG_L =						18,
+//  LORA_FREQ_REG_H =						19,
+  LORA_BW_REG =							19,
+  LORA_SF_REG =							20,
+  LORA_RSSI_REG_L =						21,
+  LORA_RSSI_REG_H =						22,
+  LORA_LR_MODE_REG = 					23,
+  LORA_RESENDS_REG =					24,
+  LORA_RESEND_DELAY_L_REG =				25,
+  LORA_RESEND_DELAY_H_REG =				26
+};
+
+
+
+// RF Bandwidth options
+#define LORA_BW_7_8KHz					0b0000
+#define LORA_BW_10_4KHz					0b0001
+#define LORA_BW_15_6KHz					0b0010
+#define LORA_BW_20_8KHz					0b0011
+#define LORA_BW_31_25KHz				0b0100
+#define LORA_BW_41_7KHz					0b0101
+#define LORA_BW_62_5KHz					0b0110
+#define LORA_BW_125KHz					0b0111
+#define LORA_BW_250KHz					0b1000
+#define LORA_BW_500KHz					0b1001
+
+// RF spreading factor options
+#define LORA_SF_64						6
+#define LORA_SF_128						7
+#define LORA_SF_256						8
+#define LORA_SF_512						9
+#define LORA_SF_1024					10
+#define LORA_SF_2048					11
+#define LORA_SF_4096					12
+
+#define LR_MODE_OFF						0
+#define LR_MODE_ON						1
+
+
+#define LORA_MODE_SLEEP					0b000
+#define LORA_MODE_STDBY					0b001
+#define LORA_MODE_TRANSMIT				0b011
+#define LORA_MODE_RXCONTINUOUS			0b101
+#define LORA_MODE_RXSINGLE				0b110
+
+
+#define LORA_RX_AVAILABLE				LORA_RX_AVAILABLE_REG
+#define LORA_RX_SIZE					LORA_RX_SIZE_REG
+#define LORA_RX_READ					LORA_RX_READ_REG
+#define LORA_RX_ADD						LORA_RX_ADD_REG
+#define LORA_TX_LOAD					LORA_TX_LOAD_REG
+#define LORA_TX_SEND					LORA_TX_SEND_REG
+#define LORA_TX_DONE					LORA_TX_DONE_REG
+#define LORA_MODE						LORA_MODE_REG
+#define LORA_FREQ_L 					LORA_FREQ_REG_L
+#define LORA_FREQ_H 					LORA_FREQ_REG_H
+#define LORA_BW							LORA_BW_REG
+#define LORA_SF							LORA_SF_REG
+#define LORA_RSSI_L						LORA_RSSI_REG_L
+#define LORA_RSSI_H						LORA_RSSI_REG_H
+#define LORA_LR_MODE					LORA_LR_MODE_REG
+#define LORA_RESENDS					LORA_RESENDS_REG
+#define LORA_RESEND_DELAY_L				LORA_RESEND_DELAY_L_REG	
+#define LORA_RESEND_DELAY_H				LORA_RESEND_DELAY_H_REG	
+
+
+#define LORA_Rx_Available(add)			readBit(add, LORA_RX_AVAILABLE, 0)
+#define LORA_Rx_Size(add)				read(add, LORA_RX_SIZE)
+#define LORA_Rx_Read(add, s, b)			read(add, LORA_RX_READ, s, b)
+#define LORA_Rx_Address(add)			read(add, LORA_RX_ADD)
+
+#define LORA_Tx_Load(add, s, d)			write(add, LORA_TX_LOAD, (uint8_t)s, (uint8_t *)d)
+#define LORA_Tx_Send(add)				write(add, LORA_TX_SEND, 1) 
+#define LORA_Tx_LR_Send(add, lrAdd)		write(add, LORA_TX_SEND, lrAdd) 
+#define LORA_Tx_Done(add)				readBit(add, LORA_TX_DONE, 0)
+
+#define LORA_Freq(add, f)				writewb(add, LORA_FREQ_L, f)
+#define LORA_Set_BW(add, bw)			writewb(add, LORA_BW, bw)
+#define LORA_Set_SF(add, sf)			writewb(add, LORA_SF, sf)
+#define LORA_RSSI(add)					readInt(add, LORA_RSSI_L)
+#define LORA_LR_Mode(add, m)			writewb(add, LORA_LR_MODE, m)
+#define LORA_Mode(add, m)				writewb(add, LORA_MODE, m)
+#define LORA_Resends(add, r)			write(add, LORA_RESENDS, r) 
+#define LORA_Resend_Delay(add, d)		writeInt(add, LORA_RESEND_DELAY_L_REG, d)
 
 /***********************************************************
 					MLINK DATATYPES
@@ -989,7 +1097,7 @@ class mLink
 		void writeBit(uint8_t add, uint8_t reg, uint8_t bit, boolean state, boolean wait = false);
 		void write(uint8_t add, uint8_t reg, uint8_t data);
 		void writewb(uint8_t add, uint8_t reg, uint8_t data);
-		void writeInt(uint8_t add, uint8_t reg, uint16_t data);	
+		void writeInt(uint8_t add, uint8_t reg, uint16_t data, boolean wait = false);	
 		//void writeLong(uint8_t add, uint8_t reg, uint32_t data);
 		void write(uint8_t add, uint8_t reg, uint16_t a, uint16_t b, boolean wait = false);
 		void write(uint8_t add, uint8_t reg, uint16_t a, uint16_t b, uint16_t c, uint16_t d, boolean wait = false);

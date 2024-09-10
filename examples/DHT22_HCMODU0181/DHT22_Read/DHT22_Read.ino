@@ -1,6 +1,6 @@
 /* FILE:    DHT22_Read.ino
-   DATE:    24/09/21
-   VERSION: 1.0
+   DATE:    10/09/24
+   VERSION: 1.0.1
    AUTHOR:  Andrew Davies
    
 
@@ -27,7 +27,7 @@ void setup()
 
 void loop() 
 {
-  mLink.write(I2C_ADD, DHT22_START_MEAS);  // Trigger a new measurement
+  mLink.DHT22_Start(I2C_ADD);                 // Trigger a new measurement
   
   while(mLink.busy(I2C_ADD));                 // Wait for the new measurement
 

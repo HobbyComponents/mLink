@@ -1,6 +1,6 @@
 /* FILE:    DHT22_Read_With_Sleep.ino
-   DATE:    04/04/23
-   VERSION: 1.1
+   DATE:    10/09/24
+   VERSION: 1.1.1
    AUTHOR:  Andrew Davies
    
 
@@ -32,7 +32,7 @@ void loop()
 {
   mLink.wake(I2C_ADD);						  // Wake the device up
 	 
-  mLink.write(I2C_ADD, DHT22_START_MEAS);     // Trigger a new measurement
+  mLink.DHT22_Start(I2C_ADD);                 // Trigger a new measurement
 
   while(mLink.busy(I2C_ADD));                 // Wait for the new measurement
 

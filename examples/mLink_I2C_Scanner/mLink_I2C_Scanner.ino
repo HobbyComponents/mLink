@@ -25,6 +25,7 @@ mLink IR Transceiver (SKU: HCMODU0195)
 mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 mLink TMP36 Temperature Sensor (HCMODU0187)
 mLink WS2812 RGB LED controller (HCMODU0197)
+mLink LongReach LoRa Transceiver (HCMODU0250)
 
 
 If your mLink module is not listed above then please update this sketch & library
@@ -216,6 +217,10 @@ void printSubType(byte add)
 	  {
 		case 0x00:
 	      Serial.print("NEC IR Transceiver");
+		  break;
+		 
+		 case 0x01:
+	      Serial.print("LongReach LoRa Tranceiver");
 		  break;
 	  }
 	  break;
