@@ -55,8 +55,6 @@ Please see Licence.txt in the library folder for terms of use.
 #define MLINK_h
 
 #ifdef __AVR__
-//Do nothing
-#else
 #include <avr/dtostrf.h>
 #endif
 
