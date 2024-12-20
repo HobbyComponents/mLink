@@ -1,6 +1,6 @@
 /* FILE:    mLink_I2C_Scanner.ino
-   DATE:    27/03/24
-   VERSION: 2.0.0
+   DATE:    18/12/24
+   VERSION: 2.1.0
    AUTHOR:  Andrew Davies
    
 
@@ -26,6 +26,7 @@ mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 mLink TMP36 Temperature Sensor (HCMODU0187)
 mLink WS2812 RGB LED controller (HCMODU0197)
 mLink LongReach LoRa Transceiver (HCMODU0250)
+mLink 12Ch Servo Controller (HCMODU0263))
 
 
 If your mLink module is not listed above then please update this sketch & library
@@ -101,21 +102,22 @@ void printType(byte add)
       Serial.print("Input");
       break;
 	  
-	 case 0x05:
-      Serial.print("Display");
-      break;
+	   case 0x05:
+       Serial.print("Display");
+       break;
 	 
-	 case 0x06:
-	  Serial.print("Wireless");
-	  break;
+	   case 0x06:
+	     Serial.print("Wireless");
+	     break;
 	 
-	 case 0x07:
-	  Serial.print("Motor controller");
+	   case 0x07:
+	     Serial.print("Motor controller");
+       break;
 
      default:
-      Serial.print("Unkown: 0x");
-      Serial.print(type, HEX);
-      break;
+       Serial.print("Unkown: 0x");
+       Serial.print(type, HEX);
+       break;
   }
 
   Serial.println();
@@ -181,8 +183,9 @@ void printSubType(byte add)
           Serial.print("RGBW PWM LED Controller");
           break;
 		
-		case 0x01:
-		  Serial.print("WS2812 RGB LED Controller");
+		    case 0x01:
+		      Serial.print("WS2812 RGB LED Controller");
+          break;
       }
       break;
 
@@ -202,35 +205,38 @@ void printSubType(byte add)
 	case 0x05:
 	  switch(subType) 
 	  {
-		case 0x00:
+		  case 0x00:
 	      Serial.print("1602 LCD");
-		  break;
+		    break;
 		
 	    case 0x01:
-		  Serial.print("2004 LCD");
-		  break;
+		    Serial.print("2004 LCD");
+		    break;
 	  }
 	  break;
 	
 	case 0x06:
 	  switch(subType) 
 	  {
-		case 0x00:
+		  case 0x00:
 	      Serial.print("NEC IR Transceiver");
-		  break;
+		    break;
 		 
-		 case 0x01:
+		  case 0x01:
 	      Serial.print("LongReach LoRa Tranceiver");
-		  break;
+		    break;
 	  }
 	  break;
 	
 	case 0x07:
 	  switch(subType) 
 	  {
-		case 0x00:
+		  case 0x00:
 	      Serial.print("L9110 DC Motor Controller");
-		  break;
+		    break;
+
+      case 0x01:
+        Serial.print("12 Channel Servo Controller");
 	  }
 	  break;
 	  

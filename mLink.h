@@ -1,6 +1,6 @@
 /* FILE:    mLink.h
-   DATE:    06/08/24
-   VERSION: 2.1.0
+   DATE:    18/12/24
+   VERSION: 2.2.0
    AUTHOR:  Andrew Davies
 
 24/09/21 version 1.0.0: Original version
@@ -23,6 +23,8 @@
 22/01/24 version 1.9.1: Minor fix to TMP36 default address definition
 25/03/24 version 2.0.0:	Added support for mLink WS2812 RGB LED controller (HCMODU0197)
 06/08/24 version 2.1.0: Added support for LongReach LoRa Transceiver (HCMODU0250)
+18/12/24 version 2.2.0: Added suppoer for mLink 12Ch servo controller (HCMODU0263)
+						Added support for mLink realy module V1.01 firmware
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -46,6 +48,7 @@ mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 mLink TMP36 Temperature Sensor (HCMODU0187)
 mLink WS2812 RGB LED controller (HCMODU0197)
 mLink LongReach LoRa Transceiver (HCMODU0250)
+mLink 12 Channel Servo Controller (HCMODU0263)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -235,6 +238,12 @@ enum MLINK_4CH_RELAY_REGISTERS
 	MLINK_RLY2_ON_TIME_H = 16,
 	MLINK_RLY3_ON_TIME_L = 17,
 	MLINK_RLY3_ON_TIME_H = 18,
+	MLINK_RLY_ON		 = 19,
+	MLINK_RLY_OFF		 = 20,
+	MLINK_RLY0_TIMER_RES = 21,
+	MLINK_RLY1_TIMER_RES = 22,
+	MLINK_RLY2_TIMER_RES = 23,
+	MLINK_RLY3_TIMER_RES = 24
 };
 
 // I2C read and write command macros
@@ -246,6 +255,9 @@ enum MLINK_4CH_RELAY_REGISTERS
 #define RLY4CH_RLY2_ON 				MLINK_RELAY_STATE_REG, 2, 1
 #define RLY4CH_RLY3_OFF 			MLINK_RELAY_STATE_REG, 3, 0
 #define RLY4CH_RLY3_ON 				MLINK_RELAY_STATE_REG, 3, 1
+
+#define RLY_RES_1S					0
+#define RLY_RES_100MS				1
 
 #define SET_RLY0(add, state)		writeBit(add, MLINK_RELAY_STATE_REG, 0, state)
 #define SET_RLY1(add, state)		writeBit(add, MLINK_RELAY_STATE_REG, 1, state)
@@ -262,10 +274,17 @@ enum MLINK_4CH_RELAY_REGISTERS
 #define RLY2_ON_TIME				MLINK_RLY2_ON_TIME_L
 #define RLY3_ON_TIME				MLINK_RLY3_ON_TIME_L
 
-#define RLY0_SetOnTime(add, time)		writeInt(add, MLINK_RLY0_ON_TIME_L, time)
-#define RLY1_SetOnTime(add, time)		writeInt(add, MLINK_RLY1_ON_TIME_L, time)
-#define RLY2_SetOnTime(add, time)		writeInt(add, MLINK_RLY2_ON_TIME_L, time)
-#define RLY3_SetOnTime(add, time)		writeInt(add, MLINK_RLY3_ON_TIME_L, time)
+#define RLY0_SetOnTime(add, time)	writeInt(add, MLINK_RLY0_ON_TIME_L, time)
+#define RLY1_SetOnTime(add, time)	writeInt(add, MLINK_RLY1_ON_TIME_L, time)
+#define RLY2_SetOnTime(add, time)	writeInt(add, MLINK_RLY2_ON_TIME_L, time)
+#define RLY3_SetOnTime(add, time)	writeInt(add, MLINK_RLY3_ON_TIME_L, time)
+
+#define RLY_ON(add, index)			write(add, MLINK_RLY_ON, index);
+#define RLY_OFF(add, index)			write(add, MLINK_RLY_OFF, index);
+#define RLY0_TIMER_RES(add, time)	write(add, MLINK_RLY0_TIMER_RES, time);
+#define RLY1_TIMER_RES(add, time)	write(add, MLINK_RLY1_TIMER_RES, time);
+#define RLY2_TIMER_RES(add, time)	write(add, MLINK_RLY2_TIMER_RES, time);
+#define RLY3_TIMER_RES(add, time)	write(add, MLINK_RLY3_TIMER_RES, time);
 /**********************************************************/
 
 
@@ -979,11 +998,9 @@ enum MLINK_LORA_REGISTERS
   LORA_RX_ADD_REG =						13,
   LORA_TX_LOAD_REG =					14,
   LORA_TX_SEND_REG =					15,
- // LORA_TX_LR_SEND_REG =					15,
   LORA_TX_DONE_REG =					16,
   LORA_MODE_REG =						17,
   LORA_FREQ_REG_L =						18,
-//  LORA_FREQ_REG_H =						19,
   LORA_BW_REG =							19,
   LORA_SF_REG =							20,
   LORA_RSSI_REG_L =						21,
@@ -1067,6 +1084,221 @@ enum MLINK_LORA_REGISTERS
 #define LORA_Resends(add, r)			write(add, LORA_RESENDS, r) 
 #define LORA_Resend_Delay(add, d)		writeInt(add, LORA_RESEND_DELAY_L_REG, d)
 
+
+/***********************************************************
+	MLINK 12 CHANNEL SERVO CONTROLLER MODULE (HCMODU0263)
+***********************************************************/
+// Default I2C address
+#define SERVO_I2C_ADD	0x60
+
+// Module specific registers
+enum MLINK_SERVO_REGISTERS
+{
+  MLINK_SERVO0_POS_REG =				10,
+  MLINK_SERVO1_POS_REG =				11,
+  MLINK_SERVO2_POS_REG =				12,
+  MLINK_SERVO3_POS_REG =				13,
+  MLINK_SERVO4_POS_REG =				14,
+  MLINK_SERVO5_POS_REG =				15,
+  MLINK_SERVO6_POS_REG =				16,
+  MLINK_SERVO7_POS_REG =				17,
+  MLINK_SERVO8_POS_REG =				18,
+  MLINK_SERVO9_POS_REG =				19,
+  MLINK_SERVO10_POS_REG =				20,
+  MLINK_SERVO11_POS_REG =				21,
+  
+  MLINK_SERVO0_LIM_REG_L = 				22,
+  MLINK_SERVO1_LIM_REG_L = 				23,
+  MLINK_SERVO2_LIM_REG_L = 				24,
+  MLINK_SERVO3_LIM_REG_L = 				25,
+  MLINK_SERVO4_LIM_REG_L = 				26,
+  MLINK_SERVO5_LIM_REG_L = 				27,
+  MLINK_SERVO6_LIM_REG_L = 				28,
+  MLINK_SERVO7_LIM_REG_L = 				29,
+  MLINK_SERVO8_LIM_REG_L = 				30,
+  MLINK_SERVO9_LIM_REG_L = 				31,
+  MLINK_SERVO10_LIM_REG_L = 			32,
+  MLINK_SERVO11_LIM_REG_L = 			33,
+  
+  MLINK_SERVO0_LIM_REG_H = 				34,
+  MLINK_SERVO1_LIM_REG_H = 				35,
+  MLINK_SERVO2_LIM_REG_H = 				36,
+  MLINK_SERVO3_LIM_REG_H = 				37,
+  MLINK_SERVO4_LIM_REG_H = 				38,
+  MLINK_SERVO5_LIM_REG_H = 				39,
+  MLINK_SERVO6_LIM_REG_H = 				40,
+  MLINK_SERVO7_LIM_REG_H = 				41,
+  MLINK_SERVO8_LIM_REG_H = 				42,
+  MLINK_SERVO9_LIM_REG_H = 				43,
+  MLINK_SERVO10_LIM_REG_H = 			44,
+  MLINK_SERVO11_LIM_REG_H = 			45,
+  
+  MLINK_SERVO_ON_REG =					46,
+  MLINK_SERVO_OFF_REG =					47,
+	
+  MLINK_SERVO_SAVE_REG =				48,
+};
+
+
+#define SERVO_SAVE_STATE				0
+#define SERVO_SAVE_DEFAULTS				1
+
+#define MLINK_SERVO0_POS				MLINK_SERVO0_POS_REG
+#define MLINK_SERVO1_POS				MLINK_SERVO1_POS_REG
+#define MLINK_SERVO2_POS				MLINK_SERVO2_POS_REG
+#define MLINK_SERVO3_POS				MLINK_SERVO3_POS_REG
+#define MLINK_SERVO4_POS				MLINK_SERVO4_POS_REG
+#define MLINK_SERVO5_POS				MLINK_SERVO5_POS_REG
+#define MLINK_SERVO6_POS				MLINK_SERVO6_POS_REG
+#define MLINK_SERVO7_POS				MLINK_SERVO7_POS_REG
+#define MLINK_SERVO8_POS				MLINK_SERVO8_POS_REG
+#define MLINK_SERVO9_POS				MLINK_SERVO9_POS_REG
+#define MLINK_SERVO10_POS				MLINK_SERVO10_POS_REG
+#define MLINK_SERVO11_POS				MLINK_SERVO11_POS_REG
+
+#define MLINK_SERVO0_LIM_L				MLINK_SERVO0_LIM_REG_L
+#define MLINK_SERVO1_LIM_L				MLINK_SERVO1_LIM_REG_L
+#define MLINK_SERVO2_LIM_L				MLINK_SERVO2_LIM_REG_L
+#define MLINK_SERVO3_LIM_L				MLINK_SERVO3_LIM_REG_L
+#define MLINK_SERVO4_LIM_L				MLINK_SERVO4_LIM_REG_L
+#define MLINK_SERVO5_LIM_L				MLINK_SERVO5_LIM_REG_L
+#define MLINK_SERVO6_LIM_L				MLINK_SERVO6_LIM_REG_L
+#define MLINK_SERVO7_LIM_L				MLINK_SERVO7_LIM_REG_L
+#define MLINK_SERVO8_LIM_L				MLINK_SERVO8_LIM_REG_L
+#define MLINK_SERVO9_LIM_L				MLINK_SERVO9_LIM_REG_L
+#define MLINK_SERVO10_LIM_L				MLINK_SERVO10_LIM_REG_L
+#define MLINK_SERVO11_LIM_L				MLINK_SERVO11_LIM_REG_L
+
+#define MLINK_SERVO0_LIM_H				MLINK_SERVO0_LIM_REG_H
+#define MLINK_SERVO1_LIM_H				MLINK_SERVO1_LIM_REG_H
+#define MLINK_SERVO2_LIM_H				MLINK_SERVO2_LIM_REG_H
+#define MLINK_SERVO3_LIM_H				MLINK_SERVO3_LIM_REG_H
+#define MLINK_SERVO4_LIM_H				MLINK_SERVO4_LIM_REG_H
+#define MLINK_SERVO5_LIM_H				MLINK_SERVO5_LIM_REG_H
+#define MLINK_SERVO6_LIM_H				MLINK_SERVO6_LIM_REG_H
+#define MLINK_SERVO7_LIM_H				MLINK_SERVO7_LIM_REG_H
+#define MLINK_SERVO8_LIM_H				MLINK_SERVO8_LIM_REG_H
+#define MLINK_SERVO9_LIM_H				MLINK_SERVO9_LIM_REG_H
+#define MLINK_SERVO10_LIM_H				MLINK_SERVO10_LIM_REG_H
+#define MLINK_SERVO11_LIM_H				MLINK_SERVO11_LIM_REG_H
+
+#define MLINK_SERVO_ON					MLINK_SERVO_ON_REG
+#define MLINK_SERVO_OFF					MLINK_SERVO_OFF_REG
+
+#define MLINK_SERVO_SAVE				MLINK_SERVO_SAVE_REG
+
+
+#define servo_On(a, s)					write(a, MLINK_SERVO_ON, s); 
+#define servo_Off(a, s)					write(a, MLINK_SERVO_OFF, s);
+
+#define servo0_On(a)					write(a, MLINK_SERVO_ON, 0); 
+#define servo1_On(a)					write(a, MLINK_SERVO_ON, 1); 
+#define servo2_On(a)					write(a, MLINK_SERVO_ON, 2); 
+#define servo3_On(a)					write(a, MLINK_SERVO_ON, 3); 
+#define servo4_On(a)					write(a, MLINK_SERVO_ON, 4); 
+#define servo5_On(a)					write(a, MLINK_SERVO_ON, 5); 
+#define servo6_On(a)					write(a, MLINK_SERVO_ON, 6); 
+#define servo7_On(a)					write(a, MLINK_SERVO_ON, 7); 
+#define servo8_On(a)					write(a, MLINK_SERVO_ON, 8); 
+#define servo9_On(a)					write(a, MLINK_SERVO_ON, 9); 
+#define servo10_On(a)					write(a, MLINK_SERVO_ON, 10); 
+#define servo11_On(a)					write(a, MLINK_SERVO_ON, 11);
+
+#define servo0_Off(a)					write(a, MLINK_SERVO_OFF, 0);
+#define servo1_Off(a)					write(a, MLINK_SERVO_OFF, 1);
+#define servo2_Off(a)					write(a, MLINK_SERVO_OFF, 2);
+#define servo3_Off(a)					write(a, MLINK_SERVO_OFF, 3);
+#define servo4_Off(a)					write(a, MLINK_SERVO_OFF, 4);
+#define servo5_Off(a)					write(a, MLINK_SERVO_OFF, 5);
+#define servo6_Off(a)					write(a, MLINK_SERVO_OFF, 6);
+#define servo7_Off(a)					write(a, MLINK_SERVO_OFF, 7);
+#define servo8_Off(a)					write(a, MLINK_SERVO_OFF, 8);
+#define servo9_Off(a)					write(a, MLINK_SERVO_OFF, 9);
+#define servo10_Off(a)					write(a, MLINK_SERVO_OFF, 10);
+#define servo11_Off(a)					write(a, MLINK_SERVO_OFF, 11);
+
+#define servo0_Pos(a, p)				write(a, MLINK_SERVO0_POS, p)
+#define servo1_Pos(a, p)				write(a, MLINK_SERVO1_POS, p)
+#define servo2_Pos(a, p)				write(a, MLINK_SERVO2_POS, p)
+#define servo3_Pos(a, p)				write(a, MLINK_SERVO3_POS, p)
+#define servo4_Pos(a, p)				write(a, MLINK_SERVO4_POS, p)
+#define servo5_Pos(a, p)				write(a, MLINK_SERVO5_POS, p)
+#define servo6_Pos(a, p)				write(a, MLINK_SERVO6_POS, p)
+#define servo7_Pos(a, p)				write(a, MLINK_SERVO7_POS, p)
+#define servo8_Pos(a, p)				write(a, MLINK_SERVO8_POS, p)
+#define servo9_Pos(a, p)				write(a, MLINK_SERVO9_POS, p)
+#define servo10_Pos(a, p)				write(a, MLINK_SERVO10_POS, p)
+#define servo11_Pos(a, p)				write(a, MLINK_SERVO11_POS, p)
+
+#define servo0_LimLow(a, p)				write(a, MLINK_SERVO0_LIM_L, p)
+#define servo1_LimLow(a, p)				write(a, MLINK_SERVO1_LIM_L, p)
+#define servo2_LimLow(a, p)				write(a, MLINK_SERVO2_LIM_L, p)
+#define servo3_LimLow(a, p)				write(a, MLINK_SERVO3_LIM_L, p)
+#define servo4_LimLow(a, p)				write(a, MLINK_SERVO4_LIM_L, p)
+#define servo5_LimLow(a, p)				write(a, MLINK_SERVO5_LIM_L, p)
+#define servo6_LimLow(a, p)				write(a, MLINK_SERVO6_LIM_L, p)
+#define servo7_LimLow(a, p)				write(a, MLINK_SERVO7_LIM_L, p)
+#define servo8_LimLow(a, p)				write(a, MLINK_SERVO8_LIM_L, p)
+#define servo9_LimLow(a, p)				write(a, MLINK_SERVO9_LIM_L, p)
+#define servo10_LimLow(a, p)			write(a, MLINK_SERVO10_LIM_L, p)
+#define servo11_LimLow(a, p)			write(a, MLINK_SERVO11_LIM_L, p)
+
+#define servo0_LimHigh(a, p)			write(a, MLINK_SERVO0_LIM_H, p)
+#define servo1_LimHigh(a, p)			write(a, MLINK_SERVO1_LIM_H, p)
+#define servo2_LimHigh(a, p)			write(a, MLINK_SERVO2_LIM_H, p)
+#define servo3_LimHigh(a, p)			write(a, MLINK_SERVO3_LIM_H, p)
+#define servo4_LimHigh(a, p)			write(a, MLINK_SERVO4_LIM_H, p)
+#define servo5_LimHigh(a, p)			write(a, MLINK_SERVO5_LIM_H, p)
+#define servo6_LimHigh(a, p)			write(a, MLINK_SERVO6_LIM_H, p)
+#define servo7_LimHigh(a, p)			write(a, MLINK_SERVO7_LIM_H, p)
+#define servo8_LimHigh(a, p)			write(a, MLINK_SERVO8_LIM_H, p)
+#define servo9_LimHigh(a, p)			write(a, MLINK_SERVO9_LIM_H, p)
+#define servo10_LimHigh(a, p)			write(a, MLINK_SERVO10_LIM_H, p)
+#define servo11_LimHigh(a, p)			write(a, MLINK_SERVO11_LIM_H, p)
+
+#define servo0_GetPos(a)				read(a, MLINK_SERVO0_POS)
+#define servo1_GetPos(a)				read(a, MLINK_SERVO1_POS)
+#define servo2_GetPos(a)				read(a, MLINK_SERVO2_POS)
+#define servo3_GetPos(a)				read(a, MLINK_SERVO3_POS)
+#define servo4_GetPos(a)				read(a, MLINK_SERVO4_POS)
+#define servo5_GetPos(a)				read(a, MLINK_SERVO5_POS)
+#define servo6_GetPos(a)				read(a, MLINK_SERVO6_POS)
+#define servo7_GetPos(a)				read(a, MLINK_SERVO7_POS)
+#define servo8_GetPos(a)				read(a, MLINK_SERVO8_POS)
+#define servo9_GetPos(a)				read(a, MLINK_SERVO9_POS)
+#define servo10_GetPos(a)				read(a, MLINK_SERVO10_POS)
+#define servo11_GetPos(a)				read(a, MLINK_SERVO11_POS)
+
+#define servo0_getLimLow(a)				read(a, MLINK_SERVO0_LIM_L)
+#define servo1_getLimLow(a)				read(a, MLINK_SERVO1_LIM_L)
+#define servo2_getLimLow(a)				read(a, MLINK_SERVO2_LIM_L)
+#define servo3_getLimLow(a)				read(a, MLINK_SERVO3_LIM_L)
+#define servo4_getLimLow(a)				read(a, MLINK_SERVO4_LIM_L)
+#define servo5_getLimLow(a)				read(a, MLINK_SERVO5_LIM_L)
+#define servo6_getLimLow(a)				read(a, MLINK_SERVO6_LIM_L)
+#define servo7_getLimLow(a)				read(a, MLINK_SERVO7_LIM_L)
+#define servo8_getLimLow(a)				read(a, MLINK_SERVO8_LIM_L)
+#define servo9_getLimLow(a)				read(a, MLINK_SERVO9_LIM_L)
+#define servo10_getLimLow(a)			read(a, MLINK_SERVO10_LIM_L)
+#define servo11_getLimLow(a)			read(a, MLINK_SERVO11_LIM_L)
+
+#define servo0_getLimHigh(a)			read(a, MLINK_SERVO0_LIM_H)
+#define servo1_getLimHigh(a)			read(a, MLINK_SERVO1_LIM_H)
+#define servo2_getLimHigh(a)			read(a, MLINK_SERVO2_LIM_H)
+#define servo3_getLimHigh(a)			read(a, MLINK_SERVO3_LIM_H)
+#define servo4_getLimHigh(a)			read(a, MLINK_SERVO4_LIM_H)
+#define servo5_getLimHigh(a)			read(a, MLINK_SERVO5_LIM_H)
+#define servo6_getLimHigh(a)			read(a, MLINK_SERVO6_LIM_H)
+#define servo7_getLimHigh(a)			read(a, MLINK_SERVO7_LIM_H)
+#define servo8_getLimHigh(a)			read(a, MLINK_SERVO8_LIM_H)
+#define servo9_getLimHigh(a)			read(a, MLINK_SERVO9_LIM_H)
+#define servo10_getLimHigh(a)			read(a, MLINK_SERVO10_LIM_H)
+#define servo11_getLimHigh(a)			read(a, MLINK_SERVO11_LIM_H)
+
+#define servo_Save_State(a)				write(a, MLINK_SERVO_SAVE, SERVO_SAVE_STATE)
+#define servo_Save_Defaults(a)			write(a, MLINK_SERVO_SAVE, SERVO_SAVE_DEFAULTS)
+
+
 /***********************************************************
 					MLINK DATATYPES
 ***********************************************************/
@@ -1097,6 +1329,7 @@ class mLink
 		void writeBit(uint8_t add, uint8_t reg, uint8_t bit, boolean state, boolean wait = false);
 		void write(uint8_t add, uint8_t reg, uint8_t data);
 		void writewb(uint8_t add, uint8_t reg, uint8_t data);
+		//void writeIntBit(uint8_t add, uint8_t reg, uint8_t bit, boolean state, boolean wait = false);
 		void writeInt(uint8_t add, uint8_t reg, uint16_t data, boolean wait = false);	
 		//void writeLong(uint8_t add, uint8_t reg, uint32_t data);
 		void write(uint8_t add, uint8_t reg, uint16_t a, uint16_t b, boolean wait = false);

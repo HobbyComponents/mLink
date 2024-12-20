@@ -1,8 +1,8 @@
 /* FILE:    mLink.cpp
-   DATE:    06/08/24
-   VERSION: 2.1.0
+   DATE:    18/12/24
+   VERSION: 2.2.0
    AUTHOR:  Andrew Davies
-   
+
 24/09/21 version 1.0.0: Original version
 24/03/22 version 1.1.0: Added support for mLink NTC Temperature sensor module (HCMODU0186)
 31/03/22 version 1.2.0: Added support for mLink matrix 4x4 keypad (HCMODU0188)
@@ -23,6 +23,8 @@
 22/01/24 version 1.9.1: Minor fix to TMP36 default address definition
 25/03/24 version 2.0.0:	Added support for mLink WS2812 RGB LED controller (HCMODU0197)
 06/08/24 version 2.1.0: Added support for LongReach LoRa Transceiver (HCMODU0250)
+18/12/24 version 2.2.0: Added suppoer for mLink 12Ch servo controller (HCMODU0263)
+						Added support for mLink realy module V1.01 firmware
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -46,6 +48,7 @@ mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 mLink TMP36 Temperature Sensor (HCMODU0187)
 mLink WS2812 RGB LED controller (HCMODU0197)
 mLink LongReach LoRa Transceiver (HCMODU0250)
+mLink 12 Channel Servo Controller (HCMODU0263)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -194,6 +197,39 @@ void mLink::writewb(uint8_t add, uint8_t reg, uint8_t data)
 
 	while(busy(add));
 }
+
+
+
+
+/* Writes to a bit in one of the mLink modules 8 bit registers.
+
+ PARAMETERS:
+
+ add: byte value containing I2C address of the mLink module. 
+
+ reg: byte value containing the register number to write to. 
+
+ bit: byte value containing the bit number within the specified register to write to. Valid values are 0 to 7.
+
+ state: boolean value containing the state to set the specified bit to.
+
+ RETURNS: 
+ Void 
+*/
+/*
+{
+	uint16_t data;
+
+	_I2CReadReg(add, reg, 2, (uint8_t *)&data);
+	
+	data = (data & ~(1 << bit)) | (state << bit);
+	
+	_I2CWriteReg(add, reg, 2, (uint8_t *)&data);
+	
+	if(wait)
+		while(busy(add));
+}*/
+
 
 
 
