@@ -1,6 +1,6 @@
 /* FILE:    mLink.h
-   DATE:    18/12/24
-   VERSION: 2.2.0
+   DATE:    18/02/25
+   VERSION: 2.2.1
    AUTHOR:  Andrew Davies
 
 24/09/21 version 1.0.0: Original version
@@ -25,6 +25,10 @@
 06/08/24 version 2.1.0: Added support for LongReach LoRa Transceiver (HCMODU0250)
 18/12/24 version 2.2.0: Added suppoer for mLink 12Ch servo controller (HCMODU0263)
 						Added support for mLink realy module V1.01 firmware
+13/02/25 version 2.2.1: Removed external reference to dtostrf.h and replaced with internal function to stop 
+						incompatibility issues with non-standard/non-avr boards
+						Added int and unsigned int overloads to the print function for boads where int != int16_t
+						and unsigned int != uint16_t
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -57,11 +61,6 @@ Please see Licence.txt in the library folder for terms of use.
 #ifndef MLINK_h
 #define MLINK_h
 
-#ifdef __AVR__
-//Do nothing
-#else
-#include <avr/dtostrf.h>
-#endif
 
 #include "Arduino.h"
 
@@ -542,7 +541,7 @@ enum MLINK_CLCD_REGISTERS
 #define cLCD_contrast(add, level)		write(add, CLCD_CONTRAST, level)
 
 #define cLCD_print(add, d)				print(add, CLCD_PRINT, d)
-#define cLCD_printFloat(add, n, dp)		print(add, CLCD_PRINT, n, dp)
+#define cLCD_printFloat(add, n, dp)		print(add, CLCD_PRINT, (float)n, dp)
 #define cLCD_printCust(add, i)			write(add, CLCD_PRINT_CUST, i)
 
 #define cLCD_setCust0(add, bitmap)   	write(add, CLCD_CUST0, 8, (uint8_t *)bitmap)
@@ -1344,8 +1343,10 @@ class mLink
 		
 		void print(uint8_t add, uint8_t reg, char c, boolean wait = false);
 		void print(uint8_t add, uint8_t reg, char *str, boolean wait = false);
-		void print(uint8_t add, uint8_t reg, uint16_t val, boolean wait = false);
-		void print(uint8_t add, uint8_t reg, int16_t val, boolean wait = false);
+//		void print(uint8_t add, uint8_t reg, uint16_t val, boolean wait = false);
+//		void print(uint8_t add, uint8_t reg, int16_t val, boolean wait = false);
+		void print(uint8_t add, uint8_t reg, int val, boolean wait = false);
+		void print(uint8_t add, uint8_t reg, unsigned int val, boolean wait = false);
 		void print(uint8_t add, uint8_t reg, float val, uint8_t dp = 0, boolean wait = false);
 
 
@@ -1355,11 +1356,7 @@ class mLink
 		uint8_t _I2CReadReg(uint8_t add, uint8_t reg);
 		void _I2CReadReg(uint8_t add, uint8_t reg, uint16_t bytes, uint8_t *data);
 		void _cout(uint8_t add, uint8_t reg, char *str, boolean wait);
-		
-		
-	//	int8_t _intToStr(int16_t x, char *str, uint8_t d);
-	//	uint8_t _ftoa(float n, char *res, uint8_t deciamlPlaces);
-	//	void _reverse(char *str, uint8_t len);
+		void _floatToCharArray(float n, char* buffer, uint8_t precision);
 };
 
 #endif

@@ -1,6 +1,6 @@
 /* FILE:    mLink.cpp
-   DATE:    18/12/24
-   VERSION: 2.2.0
+   DATE:    18/02/25
+   VERSION: 2.2.1
    AUTHOR:  Andrew Davies
 
 24/09/21 version 1.0.0: Original version
@@ -25,6 +25,10 @@
 06/08/24 version 2.1.0: Added support for LongReach LoRa Transceiver (HCMODU0250)
 18/12/24 version 2.2.0: Added suppoer for mLink 12Ch servo controller (HCMODU0263)
 						Added support for mLink realy module V1.01 firmware
+13/02/25 version 2.2.1: Removed external  reference to dtostrf.h and replaced with internal function to stop 
+						incompatibility issues with non-standard/non-avr boards
+						Added int and unsigned int overloads to the print function for boads where int != int16_t
+						and unsigned int != uint16_t
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -567,14 +571,14 @@ void mLink::print(uint8_t add, uint8_t reg, char *str, boolean wait)
  RETURNS: 
  Void 
 */
-void mLink::print(uint8_t add, uint8_t reg, uint16_t val, boolean wait)
+/*void mLink::print(uint8_t add, uint8_t reg, uint16_t val, boolean wait)
 {
 	char str[20];
 
-	dtostrf(val, 0, 0, str);
+	_floatToCharArray(val, str, 0);
 	
 	_cout(add, reg, str, wait);	
-}
+}*/
 
 
 
@@ -595,14 +599,73 @@ void mLink::print(uint8_t add, uint8_t reg, uint16_t val, boolean wait)
  RETURNS: 
  Void 
 */
-void mLink::print(uint8_t add, uint8_t reg, int16_t val, boolean wait)
+/*void mLink::print(uint8_t add, uint8_t reg, int16_t val, boolean wait)
 {
 	char str[20];
 
-	dtostrf(val, 0, 0, str);
+	_floatToCharArray(val, str, 0);
+	
+	_cout(add, reg, str, wait);
+}*/
+
+
+
+
+/* Writes a int as an ASCII string to one of the mLink registers
+   Note: int not always = to int16_t
+
+ PARAMETERS:
+ 
+ add: byte value containing I2C address of the mLink module. 
+
+ reg: byte value containing the register number to write to.
+ 
+ val: the signed integer
+ 
+ wait: optional boolean value that when set to 1 causes the function to wait for
+       the busy bit to clear before exiting the function.
+ 
+ RETURNS: 
+ Void 
+*/
+void mLink::print(uint8_t add, uint8_t reg, int val, boolean wait)
+{
+	char str[20];
+
+	_floatToCharArray(val, str, 0);
 	
 	_cout(add, reg, str, wait);
 }
+
+
+
+
+/* Writes a unsigned int as an ASCII string to one of the mLink registers
+   Note: unsigned int not always = to uint16_t
+
+ PARAMETERS:
+ 
+ add: byte value containing I2C address of the mLink module. 
+
+ reg: byte value containing the register number to write to.
+ 
+ val: the unsigned integer
+ 
+ wait: optional boolean value that when set to 1 causes the function to wait for
+       the busy bit to clear before exiting the function.
+ 
+ RETURNS: 
+ Void 
+*/
+void mLink::print(uint8_t add, uint8_t reg, unsigned int val, boolean wait)
+{
+	char str[20];
+
+	_floatToCharArray(val, str, 0);
+	
+	_cout(add, reg, str, wait);
+}
+
 
 
 
@@ -630,7 +693,7 @@ void mLink::print(uint8_t add, uint8_t reg, float val, uint8_t dp, boolean wait)
 {
 	char str[20];
 
-	dtostrf(val, 0, dp, str);
+	_floatToCharArray(val, str, dp);
 	
 	_cout(add, reg, str, wait);
 
@@ -716,7 +779,7 @@ uint8_t mLink::_I2CReadReg(uint8_t add, uint8_t reg)
   Wire.write(reg);  
   Wire.endTransmission(true);
   
-  Wire.requestFrom((int)add, 1,true);
+  Wire.requestFrom((uint8_t)add, (uint8_t)1, (uint8_t)true);
 
   Data = Wire.read();
 
@@ -750,7 +813,7 @@ void mLink::_I2CReadReg(uint8_t add, uint8_t reg, uint16_t bytes, uint8_t *data)
   Wire.endTransmission(true);
 
   
-  Wire.requestFrom((int)add, bytes, true);
+  Wire.requestFrom((uint8_t)add, (uint8_t)bytes, (uint8_t)true);
   do
   {
     data[i] = Wire.read();
@@ -795,113 +858,45 @@ void mLink::_cout(uint8_t add, uint8_t reg, char *str, boolean wait)
 
 
 
-// Converts a floating point number to string. 
+// Converts a floating point number to string (char array). 
 //
 // n is the floating point number to convert to a string
 //
-// *res is a pointer to where store the string to
+// *buffer is a pointer to where store the string to
 //
-// decimalPlaces is the number of decial places to display the number to 
-/*uint8_t mLink::_ftoa(float n, char *res, uint8_t decimalPlaces) 
-{ 
-		uint8_t k, i;
-		uint16_t expo = 1;
-		
-		// Extract integer part 
-    int ipart = (int)n; 
-		
-    // Extract floating part 
-    float fpart = n - (float)ipart; 
-		
-		// If number is negative the remove the sign
-		if(fpart < 0)
-			fpart *= -1;
-  
-	
-    // convert integer part to string 
-    i = _intToStr(ipart, res, 1); 
-  
-	
-    // Shoud the fractional part be displayed ? 
-    if (decimalPlaces != 0) 
-    { 
-        res[i] = '.';  // Add the decimal point 
-  
-        // Get the value of fraction part up to given no. 
-        // of points after dot. The third parameter is needed 
-        // to handle cases like 233.007 
-				for(k = 0; k < decimalPlaces; k++)
-					expo *= 10;
-				
-        fpart = fpart * expo;
-  
-        i = i + 1 + _intToStr((int)fpart, res + i + 1, decimalPlaces); 
-    } 
-		
-	return i;
-} */
+// precision is the number of decial places to display the number to 
+void mLink::_floatToCharArray(float n, char* buffer, uint8_t precision)
+{
+    int intPart = (int)n;  								// Extract integer part
+    float decimalPart = n - intPart;  					// Extract decimal part
 
+    if (decimalPart < 0) decimalPart = -decimalPart;  	// Ensure positive decimal
 
+														// Apply rounding correction
+    float roundingFactor = 0.5;
+    for (int i = 0; i < precision; i++) {
+        roundingFactor /= 10.0;
+    }
+    decimalPart += roundingFactor;
 
+    int i = 0;
+    if (n < 0) {  										// Handle negative numbers
+        buffer[i++] = '-';
+        intPart = -intPart;
+    }
 
-// Converts an integer to a string.
-//
-// x is the integer to convert
-//
-// *str is a pointer to where to save the string to
-//
-// d is the number of digits required in output. 
-// If d is more than the number of digits in x, then 0s are 
-// added at the beginning. 
-/*int8_t mLink::_intToStr(int16_t x, char *str, uint8_t d) 
-{ 
-	uint8_t minus = 0;
-	int i = 0; 
-		
-	// If x is negative the add a '-'	
-	if(x < 0)
-	{
-		str[i] = '-';
-		str++;
-		x *= -1;
-		minus = 1;
-	}
-		
-	// Store each digit	
-  while(x) 
-  //do 
-	{ 
-    str[i++] = (x%10) + '0'; 
-    x = x/10; 
-	}//while(x); 
-  
-	
-	// If number of digits required is more, then 
-	// add 0s at the beginning 
-	while (i < d) 
-		str[i++] = '0'; 
-  
-	// Number has been stored in reverse order to flip it
-	_reverse(str, i); 
-	
-	// Add null terminator
-	str[i] = '\0'; 
+    itoa(intPart, buffer + i, 10);  					// Convert integer part to string
+    while (buffer[i] != '\0') i++;  					// Move index to end of integer part
 
-	return i + minus; 
-} */
+    if(precision != 0)
+		buffer[i++] = '.';  							// Add decimal point
 
+    for (int j = 0; j < precision; j++) {  				// Convert decimal part
+        decimalPart *= 10;
+        int digit = (int)decimalPart;
+        buffer[i++] = '0' + digit;
+        decimalPart -= digit;
+    }
 
-
-
-// reverses a string 'str' of length 'len' 
-/*void mLink::_reverse(char *str, uint8_t len) 
-{ 
-    int i=0, j=len-1, temp; 
-    while (i<j) 
-    { 
-        temp = str[i]; 
-        str[i] = str[j]; 
-        str[j] = temp; 
-        i++; j--; 
-    } 
-} */
+    buffer[i] = '\0';  									// Null-terminate the string
+}
