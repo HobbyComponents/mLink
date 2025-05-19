@@ -1,6 +1,6 @@
 /* FILE:    mLink_LoRa_Transmit_Example.ino
-   DATE:    29/07/24
-   VERSION: 1.0
+   DATE:    19/05/25
+   VERSION: 1.0.1
    AUTHOR:  Andrew Davies
    
 
@@ -30,7 +30,7 @@ void loop()
 
   mLink.LORA_Tx_Send(I2C_ADD);                        // Send it
 
-  while(!mLink.LORA_Tx_Done(I2C_ADD));                // Wait for module to finish transmitting
+  while(mLink.LORA_Tx_Busy(I2C_ADD));                 // Wait for module to finish transmitting
 
   delay(2000);                                        // Wait a little before sending again
 }

@@ -1,6 +1,6 @@
 /* FILE:    mLink.h
-   DATE:    18/02/25
-   VERSION: 2.2.1
+   DATE:    19/05/25
+   VERSION: 2.2.2
    AUTHOR:  Andrew Davies
 
 24/09/21 version 1.0.0: Original version
@@ -29,6 +29,8 @@
 						incompatibility issues with non-standard/non-avr boards
 						Added int and unsigned int overloads to the print function for boads where int != int16_t
 						and unsigned int != uint16_t
+19/05/25 version 2.2.2: Deprecated LORA_Tx_Done() and replaced it with LORA_Tx_Busy() as the former implied the 
+						opposite logic levels.
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -997,7 +999,7 @@ enum MLINK_LORA_REGISTERS
   LORA_RX_ADD_REG =						13,
   LORA_TX_LOAD_REG =					14,
   LORA_TX_SEND_REG =					15,
-  LORA_TX_DONE_REG =					16,
+  LORA_TX_BUSY_REG =					16,
   LORA_MODE_REG =						17,
   LORA_FREQ_REG_L =						18,
   LORA_BW_REG =							19,
@@ -1050,7 +1052,7 @@ enum MLINK_LORA_REGISTERS
 #define LORA_RX_ADD						LORA_RX_ADD_REG
 #define LORA_TX_LOAD					LORA_TX_LOAD_REG
 #define LORA_TX_SEND					LORA_TX_SEND_REG
-#define LORA_TX_DONE					LORA_TX_DONE_REG
+#define LORA_TX_BUSY					LORA_TX_BUSY_REG
 #define LORA_MODE						LORA_MODE_REG
 #define LORA_FREQ_L 					LORA_FREQ_REG_L
 #define LORA_FREQ_H 					LORA_FREQ_REG_H
@@ -1072,7 +1074,8 @@ enum MLINK_LORA_REGISTERS
 #define LORA_Tx_Load(add, s, d)			write(add, LORA_TX_LOAD, (uint8_t)s, (uint8_t *)d)
 #define LORA_Tx_Send(add)				write(add, LORA_TX_SEND, 1) 
 #define LORA_Tx_LR_Send(add, lrAdd)		write(add, LORA_TX_SEND, lrAdd) 
-#define LORA_Tx_Done(add)				readBit(add, LORA_TX_DONE, 0)
+//#define LORA_Tx_Done(add)				readBit(add, LORA_TX_DONE, 0)
+#define LORA_Tx_Busy(add)				readBit(add, LORA_TX_BUSY, 0)
 
 #define LORA_Freq(add, f)				writewb(add, LORA_FREQ_L, f)
 #define LORA_Set_BW(add, bw)			writewb(add, LORA_BW, bw)

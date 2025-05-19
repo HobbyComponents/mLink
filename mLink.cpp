@@ -1,6 +1,6 @@
 /* FILE:    mLink.cpp
-   DATE:    18/02/25
-   VERSION: 2.2.1
+   DATE:    19/05/25
+   VERSION: 2.2.2
    AUTHOR:  Andrew Davies
 
 24/09/21 version 1.0.0: Original version
@@ -29,6 +29,8 @@
 						incompatibility issues with non-standard/non-avr boards
 						Added int and unsigned int overloads to the print function for boads where int != int16_t
 						and unsigned int != uint16_t
+19/05/25 version 2.2.2: Deprecated LORA_Tx_Done() and replaced it with LORA_Tx_Busy() as the former implied the 
+						opposite logic levels.
 
 
 This library adds hardware support for the Hobby Components mLink range of 
