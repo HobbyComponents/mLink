@@ -1,6 +1,6 @@
 /* FILE:    mLink_I2C_Scanner.ino
-   DATE:    18/12/24
-   VERSION: 2.1.0
+   DATE:    25/06/25
+   VERSION: 2.2.0
    AUTHOR:  Andrew Davies
    
 
@@ -26,8 +26,8 @@ mLink L9110 DC Motor Controller (SKU: HCMODU0199)
 mLink TMP36 Temperature Sensor (HCMODU0187)
 mLink WS2812 RGB LED controller (HCMODU0197)
 mLink LongReach LoRa Transceiver (HCMODU0250)
-mLink 12Ch Servo Controller (HCMODU0263))
-
+mLink 12Ch Servo Controller (HCMODU0263)
+mLink Enviromental Sensor (HCMODU0265)
 
 If your mLink module is not listed above then please update this sketch & library
 to the latest version via our support forum (forum.hobbycompoents.com).
@@ -156,6 +156,9 @@ void printSubType(byte add)
         case 0x03:
           Serial.print("Home Sensor");
           break;
+
+        case 0x04:
+          Serial.print("Environmental Sensor");
       }
       break;
 

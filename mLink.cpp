@@ -1,6 +1,6 @@
 /* FILE:    mLink.cpp
-   DATE:    19/05/25
-   VERSION: 2.2.2
+   DATE:    25/06/25
+   VERSION: 2.3.0
    AUTHOR:  Andrew Davies
 
 24/09/21 version 1.0.0: Original version
@@ -25,12 +25,16 @@
 06/08/24 version 2.1.0: Added support for LongReach LoRa Transceiver (HCMODU0250)
 18/12/24 version 2.2.0: Added suppoer for mLink 12Ch servo controller (HCMODU0263)
 						Added support for mLink realy module V1.01 firmware
-13/02/25 version 2.2.1: Removed external  reference to dtostrf.h and replaced with internal function to stop 
+13/02/25 version 2.2.1: Removed external reference to dtostrf.h and replaced with internal function to stop 
 						incompatibility issues with non-standard/non-avr boards
 						Added int and unsigned int overloads to the print function for boads where int != int16_t
 						and unsigned int != uint16_t
 19/05/25 version 2.2.2: Deprecated LORA_Tx_Done() and replaced it with LORA_Tx_Busy() as the former implied the 
 						opposite logic levels.
+27/05/25 version 2.2.3: Fixed minor bug in mLink Relay Read_Relay_0.ino sketch that caused a compile error.
+25/06/25 version 2.3.0:	Added support for mLink environmental sensor (HCMODU0265)
+						Added readFloat() function.
+
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -55,6 +59,7 @@ mLink TMP36 Temperature Sensor (HCMODU0187)
 mLink WS2812 RGB LED controller (HCMODU0197)
 mLink LongReach LoRa Transceiver (HCMODU0250)
 mLink 12 Channel Servo Controller (HCMODU0263)
+mLink Environmental Sensor (HCMODU0265)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -504,6 +509,41 @@ void mLink::read(uint8_t add, uint8_t reg, uint8_t bytes, uint8_t *data)
 {
 	_I2CReadReg(add, reg, bytes, data);	
 }
+
+
+
+
+
+/* Reads the state of four consecutive 8 bit registers and returns the result 
+ as a float.
+
+ PARAMETERS:
+
+ add: byte value containing I2C address of the mLink module. 
+
+ reg: byte value containing the address of the first register to read.
+
+
+ RETURNS: 
+ A floating point number (float)
+ 
+ NOTE: 
+ Assumes little endian (ATMega/ESP/STM32/ARM are all little endian).
+*/
+
+float mLink::readFloat(uint8_t add, uint8_t reg)
+{
+	union
+	{
+		uint8_t data[4];
+		float	f;
+	}result;
+	
+	_I2CReadReg(add, reg, 4, result.data);	
+	
+	return result.f;
+}
+
 
 
 

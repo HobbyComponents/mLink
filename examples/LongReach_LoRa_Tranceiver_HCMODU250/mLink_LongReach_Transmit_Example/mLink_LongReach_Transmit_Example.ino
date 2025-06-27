@@ -1,6 +1,6 @@
 /* FILE:    mLink_LongReach_Transmit_Example.ino
-   DATE:    29/07/24
-   VERSION: 1.0
+   DATE:    20/05/25
+   VERSION: 1.0.1
    AUTHOR:  Andrew Davies
    
 
@@ -33,9 +33,11 @@ void loop()
 {
   mLink.LORA_Tx_Load(I2C_ADD, 5, switchON);           // Load the Tx buffer with the switch on command
   mLink.LORA_Tx_LR_Send(I2C_ADD, 0);                  // Send it to LongReach module(s) with address 0
+  while(mLink.LORA_Tx_Busy(I2C_ADD));                 // Wait for module to finish transmitting
   delay(2000);
 
   mLink.LORA_Tx_Load(I2C_ADD, 5, switchOFF);          // Load the Tx buffer with the switch off command
   mLink.LORA_Tx_LR_Send(I2C_ADD, 0);                  // Send it to LongReach module(s) with address 0
+  while(mLink.LORA_Tx_Busy(I2C_ADD));                 // Wait for module to finish transmitting
   delay(2000);
 }

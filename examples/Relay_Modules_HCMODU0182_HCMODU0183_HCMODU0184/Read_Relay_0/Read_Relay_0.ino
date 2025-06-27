@@ -1,6 +1,6 @@
 /* FILE:    Read_Relay_0.ino
-   DATE:    04/10/21
-   VERSION: 1.0
+   DATE:    27/05/25
+   VERSION: 1.0.1
    AUTHOR:  Andrew Davies
    
 
@@ -18,12 +18,12 @@ mLink 4 Channel relay module (SKU: HCMODU0184)
 Please see Licence.txt in the library folder for terms of use.
 */
 
-#include "mLink.h"                      // Include the library
+#include "mLink.h"                      	  // Include the library
 
-mLink mLink;                            // Create an instance of the library
+mLink mLink;                            	  // Create an instance of the library
 
 
-#define I2C_ADD 0x52                    // Default I2C address
+#define I2C_ADD 0x52                    	  // Default I2C address
 
 boolean lastState;
 
@@ -31,19 +31,19 @@ void setup()
 {
   Serial.begin(9600);
   
-  mLink.init();                         // Initialise the library
+  mLink.init();                         	  // Initialise the library
 
-  lastState = mLink.READ_RLY0(add);     // Get the current state of relay 0
+  lastState = mLink.READ_RLY0(I2C_ADD);     // Get the current state of relay 0
 }
 
 
 void loop() 
 {
-  if(mLink.READ_RLY0(add) != lastState) // Check if relay state has changed
+  if(mLink.READ_RLY0(I2C_ADD) != lastState) // Check if relay state has changed
   {
-    lastState = mLink.READ_RLY0(add);   // If so store new state...
+    lastState = mLink.READ_RLY0(I2C_ADD);   // If so store new state...
     
-    Serial.print("Relay 0 = ");         // and output the new state to the serial monitor
+    Serial.print("Relay 0 = ");         	  // and output the new state to the serial monitor
 
     if(lastState == 1)
       Serial.println("ON");

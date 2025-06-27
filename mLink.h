@@ -1,6 +1,6 @@
 /* FILE:    mLink.h
-   DATE:    19/05/25
-   VERSION: 2.2.2
+   DATE:    25/06/25
+   VERSION: 2.3.0
    AUTHOR:  Andrew Davies
 
 24/09/21 version 1.0.0: Original version
@@ -31,6 +31,10 @@
 						and unsigned int != uint16_t
 19/05/25 version 2.2.2: Deprecated LORA_Tx_Done() and replaced it with LORA_Tx_Busy() as the former implied the 
 						opposite logic levels.
+27/05/25 version 2.2.3: Fixed minor bug in mLink Relay Read_Relay_0.ino sketch that caused a compile error.
+25/06/25 version 2.3.0:	Added support for mLink environmental sensor (HCMODU0265)
+						Added readFloat() function.
+
 
 
 This library adds hardware support for the Hobby Components mLink range of 
@@ -55,6 +59,7 @@ mLink TMP36 Temperature Sensor (HCMODU0187)
 mLink WS2812 RGB LED controller (HCMODU0197)
 mLink LongReach LoRa Transceiver (HCMODU0250)
 mLink 12 Channel Servo Controller (HCMODU0263)
+mLink Environmental Sensor (HCMODU0265)
 
 Please see Licence.txt in the library folder for terms of use.
 */
@@ -1302,19 +1307,49 @@ enum MLINK_SERVO_REGISTERS
 
 
 /***********************************************************
-					MLINK DATATYPES
+		MLINK ENVIRONMENTAL SENSOR (HCMODU0265)
 ***********************************************************/
-/*enum MLINK_DATA_TYPES
+// Default I2C address
+#define ENV_I2C_ADD	0x61
+
+// Module specific registers
+enum MLINK_ENV_REGISTERS
 {
-  MLINK_UINT8,
-  MLINK_INT8,
-  MLINK_UINT16,
-  MLINK_INT16,
-  MLINK_UWORD,
-  MLINK_WORD,
-  MLINK_FLOAT,
-  MLINK_INT16_1DP
-};*/
+  MLINK_ENV_TRIG_REG =					10,
+  MLINK_ENV_TMP0_REG =					11,
+  MLINK_ENV_TMP1_REG =					12,
+  MLINK_ENV_TMP2_REG =					13,
+  MLINK_ENV_TMP3_REG =					14,
+  
+  MLINK_ENV_HUM0_REG =					15,
+  MLINK_ENV_HUM1_REG =					16,
+  MLINK_ENV_HUM2_REG =					17,
+  MLINK_ENV_HUM3_REG =					18,
+  
+  MLINK_ENV_PRS0_REG =					19,
+  MLINK_ENV_PRS1_REG =					20,
+  MLINK_ENV_PRS2_REG =					21,
+  MLINK_ENV_PRS3_REG = 					22,
+  
+  MLINK_ENV_AMB0_REG = 					23,
+  MLINK_ENV_AMB1_REG = 					24,
+  MLINK_ENV_AMB2_REG = 					25,
+  MLINK_ENV_AMB3_REG = 					26,
+  
+  MLINK_ENV_WHT0_REG = 					27,
+  MLINK_ENV_WHT1_REG = 					28,
+  MLINK_ENV_WHT2_REG = 					29,
+  MLINK_ENV_WHT3_REG = 					30,
+};
+
+
+#define envSens_Trigger(add)			write(add, MLINK_ENV_TRIG_REG, 0x01)
+#define envSens_Temp(add)				readFloat(add, MLINK_ENV_TMP0_REG)
+#define envSens_Hum(add)				readFloat(add, MLINK_ENV_HUM0_REG)
+#define envSens_Pres(add)				readFloat(add, MLINK_ENV_PRS0_REG)
+#define envSens_Amb(add)				readFloat(add, MLINK_ENV_AMB0_REG)
+#define envSens_Wht(add)				readFloat(add, MLINK_ENV_WHT0_REG)
+
 /**********************************************************/
 
 
@@ -1342,6 +1377,7 @@ class mLink
 		uint8_t read(uint8_t add, uint8_t reg);
 		int16_t readInt(uint8_t add, uint8_t reg);
 		uint16_t readuInt(uint8_t add, uint8_t reg);
+		float readFloat(uint8_t add, uint8_t reg);
 		void read(uint8_t add, uint8_t reg, uint8_t bytes, uint8_t *data);
 		
 		void print(uint8_t add, uint8_t reg, char c, boolean wait = false);
